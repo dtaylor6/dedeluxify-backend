@@ -1,0 +1,22 @@
+{
+  "name": "gear-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dtaylor6/gear-backend.git"
+  },
+  "author": "Daniel Taylor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dtaylor6/gear-backend/issues"
+  },
+  "homepage": "https://github.com/dtaylor6/gear-backend#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
