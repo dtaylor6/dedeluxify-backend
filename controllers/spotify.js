@@ -4,20 +4,19 @@ const config = require('../utils/config')
 const querystring = require('node:querystring')
 const crypto = require('node:crypto')
 
-const client_id = config.SPOTIFY_CLIENT_ID
+const spotify_client_id = config.SPOTIFY_CLIENT_ID
 const spotify_client_secret = config.SPOTIFY_SECRET
 const port = config.PORT
 const redirect_uri = `http://localhost:${port}/api/spotify/callback`
 
 spotifyRouter.get('/login', (req, res) => {
-
   const state = crypto.randomBytes(64).toString('hex')
   const scope = 'streaming user-read-private user-read-email'
 
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
-      client_id: client_id,
+      client_id: spotify_client_id,
       scope: scope,
       redirect_uri: redirect_uri,
       state: state
@@ -35,7 +34,7 @@ spotifyRouter.get('/callback', (req, res) => {
       grant_type: 'authorization_code'
     }, {
       headers: {
-        'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + spotify_client_secret).toString('base64')),
+        'Authorization': 'Basic ' + (Buffer.from(spotify_client_id + ':' + spotify_client_secret).toString('base64')),
         'Content-Type' : 'application/x-www-form-urlencoded'
       }
     })
