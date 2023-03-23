@@ -39,7 +39,6 @@ spotifyRouter.get('/callback', (req, res) => {
       }
     })
     .then((response) => {
-      console.log(response)
       const access_token = response.data.access_token
       res.status(201).json({
         access_token
