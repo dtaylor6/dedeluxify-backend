@@ -1,3 +1,5 @@
-.env
 .git/
 build/
+.env
+
+.eslintrc.js
