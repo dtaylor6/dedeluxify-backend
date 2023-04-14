@@ -16,7 +16,8 @@ spotifyRouter.get('/login', (req, res) => {
   const state = crypto.randomBytes(64).toString('hex')
   res.cookie(stateKey, state)
 
-  const scope = 'streaming user-read-private user-read-email'
+  const scope = 'streaming user-read-private user-read-email user-modify-playback-state'
+
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
