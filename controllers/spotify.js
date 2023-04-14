@@ -60,7 +60,7 @@ spotifyRouter.get('/callback', (req, res) => {
     if (!error && response.statusCode === 200) {
       const access_token = body.access_token
 
-      return res.redirect(`http://localhost:${frontend_port}/?` +
+      return res.redirect(`http://localhost:${frontend_port}/login?` +
         querystring.stringify({
           access_token: access_token
           //refresh_token: refresh_token
