@@ -1,3 +1,4 @@
+const axios = require('axios')
 const request = require('request')
 const spotifyRouter = require('express').Router()
 const config = require('../utils/config')
@@ -74,6 +75,44 @@ spotifyRouter.get('/callback', (req, res) => {
       )
     }
   })
+})
+
+spotifyRouter.get('/search', (req, res) => {
+  const query = req.query.q
+  const auth = req.headers['authorization']
+
+  axios
+    .get(
+      'https://api.spotify.com/v1/search', {
+        params: {
+          q: query,
+          type: 'album'
+        },
+        headers: {
+          'Authorization': auth,
+        }
+      }
+    )
+    .then((response) => {
+      res.status(200).json(response.data)
+    })
+    .catch ((error) => {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser
+        // and an instance of http.ClientRequest in node.js
+        console.log(error.request)
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message)
+      }
+    })
 })
 
 module.exports = spotifyRouter
