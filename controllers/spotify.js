@@ -81,6 +81,11 @@ spotifyRouter.get('/search', (req, res) => {
   const query = req.query.q
   const auth = req.headers['authorization']
 
+  // Prevent empty query request to Spotify API
+  if (query === '') {
+    return res.status(400).send('No search query')
+  }
+
   axios
     .get(
       'https://api.spotify.com/v1/search', {
