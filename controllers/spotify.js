@@ -115,4 +115,10 @@ spotifyRouter.get('/search', (req, res) => {
     })
 })
 
+spotifyRouter.get('/play', (req, res) => {
+  const uri = req.query.album_uri
+  const auth = req.headers['authorization']
+  console.log(uri)
+})
+
 module.exports = spotifyRouter
