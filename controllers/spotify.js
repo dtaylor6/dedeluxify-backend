@@ -94,7 +94,7 @@ spotifyRouter.get('/search', (req, res) => {
       }
     )
     .then((response) => {
-      res.status(200).json(response.data)
+      res.status(200).json(response.data.albums.items)
     })
     .catch ((error) => {
       if (error.response) {
