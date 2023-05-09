@@ -6,6 +6,7 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 
 const spotifyRouter = require('./controllers/spotify')
+const spotifyAuthRouter = require('./controllers/spotifyAuth')
 const discogsRouter = require('./controllers/discogs')
 const middleware = require('./utils/middleware')
 
@@ -15,6 +16,7 @@ app.use(express.json())
 
 app.use(middleware.requestLogger)
 
+app.use('/api/spotify', spotifyAuthRouter)
 app.use('/api/spotify', spotifyRouter)
 app.use('/api/discogs', discogsRouter)
 
