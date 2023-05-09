@@ -77,7 +77,7 @@ spotifyRouter.get('/callback', (req, res) => {
   })
 })
 
-spotifyRouter.get('/search', (req, res) => {
+spotifyRouter.get('/search', (req, res, next) => {
   const query = req.query.q
   const auth = req.headers['authorization']
 
@@ -90,7 +90,8 @@ spotifyRouter.get('/search', (req, res) => {
     .get(
       'https://api.spotify.com/v1/search', {
         params: {
-          q: query,
+          //q: query,
+          q: '',
           type: 'album'
         },
         headers: {
@@ -102,25 +103,11 @@ spotifyRouter.get('/search', (req, res) => {
       res.status(200).json(response.data.albums.items)
     })
     .catch ((error) => {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser
-        // and an instance of http.ClientRequest in node.js
-        console.log(error.request)
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message)
-      }
+      next(error)
     })
 })
 
-spotifyRouter.get('/play', (req, res) => {
+spotifyRouter.get('/play', (req, res, next) => {
   const uri = req.query.album_uri
   const auth = req.headers['authorization']
   console.log(uri)

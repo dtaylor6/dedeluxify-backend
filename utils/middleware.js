@@ -14,34 +14,28 @@ const unknownEndpoint = (request, response, next) => {
 }
 
 // todo: change this maybe?
-const errorHandler = (error, request, response, next) => {
-  if (error.name === 'CastError') {
-    return response.status(400).send({
-      error: 'malformatted id'
-    })
-  } else if (error.name === 'ValidationError') {
-    return response.status(400).json({
-      error: error.message
-    })
-  } else if (error.name === 'JsonWebTokenError') {
-    return response.status(401).json({
-      error: 'invalid token'
-    })
+const errorHandler = (err, req, res, next) => {
+  if (err.response) {
+    // The request was made and the server responded with a status code
+    // that falls out of the range of 2xx
+    logger.error(err.response.data)
+    logger.error(err.response.status)
+    logger.error(err.response.headers)
+    return res.status(err.response.status).send(err.response.data)
   }
-
-  logger.error(error.message)
-
-  next(error)
+  else if (err.request) {
+    // The request was made but no response was received
+    // `error.request` is an instance of XMLHttpRequest in the browser
+    // and an instance of http.ClientRequest in node.js
+    logger.error(err.request)
+    return res.status(500).send(err.request)
+  }
+  else {
+    // Something happened in setting up the request that triggered an Error
+    logger.error('Error', err.message)
+    return res.status(500).send('Something went wrong with the dedeluxify-backend')
+  }
 }
-
-// const tokenExtractor = (request, response, next) => {
-//   const authorization = request.get('authorization')
-//   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-//     request.token = authorization.substring(7)
-//   }
-
-//   next()
-// }
 
 module.exports = {
   requestLogger,
