@@ -13,7 +13,6 @@ const unknownEndpoint = (request, response, next) => {
   next()
 }
 
-// todo: change this maybe?
 const errorHandler = (err, req, res, next) => {
   if (err.response) {
     // The request was made and the server responded with a status code
@@ -35,6 +34,20 @@ const errorHandler = (err, req, res, next) => {
     logger.error('Error', err.message)
     return res.status(500).send('Something went wrong with the dedeluxify-backend')
   }
+}
+
+const spotifyTokenExtractor = (req, res, next) => {
+  const auth = req.headers['authorization']
+
+  if (auth === '') {
+    return res.status(401).send('No Spotify auth token given in header')
+  }
+  else if (!auth.startsWith('Bearer ')) {
+    return res.status(401).send('Malformatted Spotify auth token given in \
+                                 header. Must be of format: Bearer <token>')
+  }
+
+  next()
 }
 
 module.exports = {

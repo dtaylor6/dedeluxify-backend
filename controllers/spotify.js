@@ -109,7 +109,10 @@ spotifyRouter.get('/search', (req, res, next) => {
 spotifyRouter.get('/play', (req, res, next) => {
   const uri = req.query.album_uri
   const auth = req.headers['authorization']
-  console.log(uri)
+
+  if (uri === '') {
+    return res.status(400).send('No album uri specified')
+  }
 })
 
 module.exports = spotifyRouter
