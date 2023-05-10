@@ -1,9 +1,24 @@
 const axios = require('axios')
 const spotifyRouter = require('express').Router()
 
+// Ensure a proper token is given
+spotifyRouter.use((req, res, next) => {
+  const auth = req.headers['authorization']
+
+  if (auth === '') {
+    return res.status(401).send('No Spotify auth token given in header')
+  }
+  else if (!auth.startsWith('Bearer ')) {
+    return res.status(401).send('Malformatted Spotify auth token given in \
+                                 header. Must be of format: Bearer <token>')
+  }
+
+  req.token = auth
+  next()
+})
+
 spotifyRouter.get('/search', (req, res, next) => {
   const query = req.query.q
-  const auth = req.headers['authorization']
 
   // Prevent empty query request to Spotify API
   if (query === '') {
@@ -18,7 +33,7 @@ spotifyRouter.get('/search', (req, res, next) => {
           type: 'album'
         },
         headers: {
-          'Authorization': auth,
+          'Authorization': req.token,
         }
       }
     )
@@ -32,7 +47,6 @@ spotifyRouter.get('/search', (req, res, next) => {
 
 spotifyRouter.get('/play', (req, res, next) => {
   const uri = req.query.album_uri
-  const auth = req.headers['authorization']
 
   if (uri === '') {
     return res.status(400).send('No album uri specified')

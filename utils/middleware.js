@@ -8,8 +8,8 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-const unknownEndpoint = (request, response, next) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (req, res, next) => {
+  res.status(404).send({ error: 'unknown endpoint' })
   next()
 }
 
@@ -34,20 +34,6 @@ const errorHandler = (err, req, res, next) => {
     logger.error('Error', err.message)
     return res.status(500).send('Something went wrong with the dedeluxify-backend')
   }
-}
-
-const spotifyTokenExtractor = (req, res, next) => {
-  const auth = req.headers['authorization']
-
-  if (auth === '') {
-    return res.status(401).send('No Spotify auth token given in header')
-  }
-  else if (!auth.startsWith('Bearer ')) {
-    return res.status(401).send('Malformatted Spotify auth token given in \
-                                 header. Must be of format: Bearer <token>')
-  }
-
-  next()
 }
 
 module.exports = {
