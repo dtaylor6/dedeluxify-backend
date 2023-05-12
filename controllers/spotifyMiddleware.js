@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-// Gets all of the album tracks and puts them in an array req.tracks
+// Gets all of the album tracks and puts them in array req.tracks
 const getAlbumTracks = async (req, res, next) => {
   const albumId = req.query.albumId
 
