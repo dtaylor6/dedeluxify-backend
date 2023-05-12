@@ -1,7 +1,7 @@
 const axios = require('axios')
 const spotifyRouter = require('express').Router()
 
-const getAlbumTracks = require('./spotifyMiddleware').getAlbumTracks
+const getAlbumTracks = require('../utils/spotifyMiddleware').getAlbumTracks
 
 // Ensure a proper token is given for each request to this route
 spotifyRouter.use((req, res, next) => {
