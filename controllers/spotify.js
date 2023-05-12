@@ -1,7 +1,9 @@
 const axios = require('axios')
 const spotifyRouter = require('express').Router()
 
-// Ensure a proper token is given
+const getAlbumTracks = require('./spotifyMiddleware').getAlbumTracks
+
+// Ensure a proper token is given for each request to this route
 spotifyRouter.use((req, res, next) => {
   const auth = req.headers['authorization']
 
@@ -45,12 +47,8 @@ spotifyRouter.get('/search', (req, res, next) => {
     })
 })
 
-spotifyRouter.get('/play', (req, res, next) => {
-  const uri = req.query.album_uri
-
-  if (uri === '') {
-    return res.status(400).send('No album uri specified')
-  }
+spotifyRouter.get('/play', [getAlbumTracks], async (req, res, next) => {
+  console.log('Tracks', req.tracks)
 })
 
 module.exports = spotifyRouter
