@@ -47,7 +47,9 @@ spotifyRouter.get('/search', (req, res, next) => {
     })
 })
 
-spotifyRouter.get('/play', [getAlbumTracks], async (req, res, next) => {
+spotifyRouter.get('/play', async (req, res, next) => {
+  await Promise.all([getAlbumTracks(req, res, next)])
+
   const tracks = req.tracks // From getAlbumTracks middleware
   const trackNames = tracks.map(track => track.name)
   console.log('Track names:', trackNames)
