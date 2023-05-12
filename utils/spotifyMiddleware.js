@@ -9,28 +9,11 @@ const getAlbumTracks = async (req, res, next) => {
   }
 
   const tracks = []
-  let spotifyResponse = await axios
-    .get(
-      `https://api.spotify.com/v1/albums/${albumId}/tracks`, {
-        params: {
-          limit: 50,
-        },
-        headers: {
-          'Authorization': req.token,
-        }
-      }
-    )
-    .catch((error) => {
-      next(error)
-    })
 
-  spotifyResponse.data.items.forEach(item => tracks.push(item))
-
-  // Due to limit of 50, we may have to call Spotify API multiple times to get all album tracks
-  while (spotifyResponse.data.next !== null && spotifyResponse.data.next !== undefined) {
-    spotifyResponse = await axios
+  try {
+    let spotifyResponse = await axios
       .get(
-        `${spotifyResponse.data.next}`, {
+        `https://api.spotify.com/v1/albums/${albumId}/tracks`, {
           params: {
             limit: 50,
           },
@@ -39,11 +22,28 @@ const getAlbumTracks = async (req, res, next) => {
           }
         }
       )
-      .catch((error) => {
-        next(error)
-      })
 
     spotifyResponse.data.items.forEach(item => tracks.push(item))
+
+    // Due to limit of 50, we may have to call Spotify API multiple times to get all album tracks
+    while (spotifyResponse.data.next !== null && spotifyResponse.data.next !== undefined) {
+      spotifyResponse = await axios
+        .get(
+          `${spotifyResponse.data.next}`, {
+            params: {
+              limit: 50,
+            },
+            headers: {
+              'Authorization': req.token,
+            }
+          }
+        )
+
+      spotifyResponse.data.items.forEach(item => tracks.push(item))
+    }
+  }
+  catch(error) {
+    next(error)
   }
 
   req.tracks = tracks
