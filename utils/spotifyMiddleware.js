@@ -46,7 +46,7 @@ const getAlbumTracks = async (req, res, next) => {
     next(error)
   }
 
-  req.tracks = tracks
+  req.spotifyTracks = tracks
   next()
 }
 
