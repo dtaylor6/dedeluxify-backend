@@ -34,8 +34,9 @@ const getAlbumTracks = async (albumId, token) => {
         )
 
       spotifyResponse.data.items.forEach(item => tracks.push(item))
-      return Promise.resolve(tracks)
     }
+
+    return Promise.resolve(tracks)
   }
   catch(error) {
     return Promise.reject(error)
