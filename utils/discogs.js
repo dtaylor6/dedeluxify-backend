@@ -1,6 +1,8 @@
 const axios = require('axios')
 const config = require('./config')
 
+const getAlbumInfo = require('./spotifyMiddleware').getAlbumInfo
+
 const discogs_client_id = config.DISCOGS_CLIENT_ID
 const discogs_secret = config.DISCOGS_SECRET
 
@@ -10,30 +12,34 @@ const REQUEST_HEADERS = {
 }
 
 const getOriginalAlbumTracks = async (req, res, next) => {
-  const query = req.query.q // TODO: Change this param
-
   const tracks = []
   try {
-    // TODO: change where this information is acquired from Discogs
+    const albumInfo = await getAlbumInfo(req, res, next)
+    //console.log('Spotify album info in getOriginalTracks',albumInfo)
+    const artist = albumInfo.artists[0].name
+    const album = albumInfo.name
+    console.log(`${artist} - ${album}`)
+
     const discogsResponse = await axios
       .get(
         'https://api.discogs.com/database/search', {
           params: {
-            q: query,
-            type: 'master',
+            artist,
+            type: 'master'
           },
           headers: REQUEST_HEADERS
         }
       )
 
-    discogsResponse.data.items.forEach(item => tracks.push(item))
+    //console.log('Discogs album info in getOriginalTracks',discogsResponse.data.results[0])
+    discogsResponse.data.results.forEach(result => tracks.push(result))
+    return Promise.resolve(tracks)
   }
   catch(error) {
-    next(error)
+    return Promise.reject(error)
   }
-
-  req.discogsTracks = tracks
-  next()
 }
 
-module.exports = getOriginalAlbumTracks
+module.exports = {
+  getOriginalAlbumTracks
+}

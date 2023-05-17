@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { getOriginalAlbumTracks } = require('../utils/discogs')
 const spotifyRouter = require('express').Router()
 
 const getAlbumTracks = require('../utils/spotifyMiddleware').getAlbumTracks
@@ -48,11 +49,30 @@ spotifyRouter.get('/search', (req, res, next) => {
 })
 
 spotifyRouter.get('/play', async (req, res, next) => {
-  await Promise.all([getAlbumTracks(req, res, next)])
+  const albumId = req.query.albumId
 
-  const spotifyTracks = req.spotifyTracks // From getAlbumTracks middleware
-  const spotifyTrackNames = spotifyTracks.map(track => track.name)
-  console.log('Track names:', spotifyTrackNames)
+  if (albumId === '') {
+    return res.status(400).send('No album id specified')
+  }
+
+  try {
+    // Execute both async functions in parallel
+    Promise.all([getAlbumTracks(req, res, next), getOriginalAlbumTracks(req, res, next)]).then((values) => {
+      console.log('In router spotifyRouter.get', values)
+    })
+  }
+  catch(error) {
+    next(error)
+  }
+
+  // const spotifyTracks = req.spotifyTracks // From getAlbumTracks middleware
+  // const spotifyTrackNames = spotifyTracks.map(track => track.name)
+  // console.log('Track names:', spotifyTrackNames)
+
+  //const discogsTracks = req.discogsTracks // From getOriginalAlbumTracks middleware
+  //const discogsTrackNames = discogsTracks.map(track => track.name)
+  //console.log('Original track names:', discogsTrackNames)
+  res.status(200).send()
 })
 
 module.exports = spotifyRouter
