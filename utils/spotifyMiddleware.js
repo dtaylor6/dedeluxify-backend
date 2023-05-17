@@ -1,8 +1,7 @@
 const axios = require('axios')
 
 // Gets all of the album tracks and puts them in array req.tracks
-const getAlbumTracks = async (req, res, next) => {
-  const albumId = req.query.albumId
+const getAlbumTracks = async (albumId, token) => {
   const tracks = []
 
   try {
@@ -13,7 +12,7 @@ const getAlbumTracks = async (req, res, next) => {
             limit: 50,
           },
           headers: {
-            'Authorization': req.token,
+            'Authorization': token,
           }
         }
       )
@@ -29,7 +28,7 @@ const getAlbumTracks = async (req, res, next) => {
               limit: 50,
             },
             headers: {
-              'Authorization': req.token,
+              'Authorization': token,
             }
           }
         )
@@ -43,15 +42,14 @@ const getAlbumTracks = async (req, res, next) => {
   }
 }
 
-const getAlbumInfo = async (req, res, next) => {
-  const albumId = req.query.albumId
+const getAlbumInfo = async (albumId, token) => {
   try {
     let spotifyResponse = await axios
       .get(
         `https://api.spotify.com/v1/albums/${albumId}`, {
 
           headers: {
-            'Authorization': req.token,
+            'Authorization': token,
           }
         }
       )

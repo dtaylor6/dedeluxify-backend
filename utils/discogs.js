@@ -11,10 +11,10 @@ const REQUEST_HEADERS = {
   'User-Agent': 'Dedeluxify/1.0'
 }
 
-const getOriginalAlbumTracks = async (req, res, next) => {
+const getOriginalAlbumTracks = async (albumId, token) => {
   const tracks = []
   try {
-    const albumInfo = await getAlbumInfo(req, res, next)
+    const albumInfo = await getAlbumInfo(albumId, token)
     //console.log('Spotify album info in getOriginalTracks',albumInfo)
     const artist = albumInfo.artists[0].name
     const album = albumInfo.name

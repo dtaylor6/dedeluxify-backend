@@ -50,6 +50,7 @@ spotifyRouter.get('/search', (req, res, next) => {
 
 spotifyRouter.get('/play', async (req, res, next) => {
   const albumId = req.query.albumId
+  const token = req.token
 
   if (albumId === '') {
     return res.status(400).send('No album id specified')
@@ -57,7 +58,7 @@ spotifyRouter.get('/play', async (req, res, next) => {
 
   try {
     // Execute both async functions in parallel
-    Promise.all([getAlbumTracks(req, res, next), getOriginalAlbumTracks(req, res, next)]).then((values) => {
+    Promise.all([getAlbumTracks(albumId, token), getOriginalAlbumTracks(albumId, token)]).then((values) => {
       console.log('In router spotifyRouter.get', values)
     })
   }
