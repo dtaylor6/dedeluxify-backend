@@ -1,7 +1,8 @@
 const axios = require('axios')
-const config = require('./config')
 
-const getAlbumInfo = require('./spotifyMiddleware').getAlbumInfo
+const config = require('./config')
+const { trimMusicString } = require('./stringUtils')
+const { getAlbumInfo } = require('./spotifyMiddleware')
 
 const discogs_client_id = config.DISCOGS_CLIENT_ID
 const discogs_secret = config.DISCOGS_SECRET
@@ -11,20 +12,45 @@ const REQUEST_HEADERS = {
   'User-Agent': 'Dedeluxify/1.0'
 }
 
+// Queries Discogs for master based on Spotify album info and returns the tracks.
+// May return an empty array in the case of empty Discogs query results.
 const getOriginalAlbumTracks = async (albumId, token) => {
-  const tracks = []
   try {
+    const originalTracks = []
+
     const albumInfo = await getAlbumInfo(albumId, token)
-    //console.log('Spotify album info in getOriginalTracks',albumInfo)
+    const queryResults = await queryMasters(albumInfo)
+
+    if (queryResults.length > 0) {
+      // TODO: add function to parse this to ensure relevant master
+      const masterId = queryResults[0].master_id
+      const masterTracks = await getMasterTracks(masterId)
+      masterTracks.forEach(track => originalTracks.push(track))
+    }
+
+    //console.log(originalTracks)
+    return Promise.resolve(originalTracks)
+  }
+  catch(error) {
+    return Promise.reject(error)
+  }
+}
+
+// Searches Discogs database for masters based on album info and returns query results
+const queryMasters = async (albumInfo) => {
+  try {
+    const queryResults = []
     const artist = albumInfo.artists[0].name
-    const album = albumInfo.name
-    console.log(`${artist} - ${album}`)
+    const album = trimMusicString(albumInfo.name)
+    //console.log('Before:', albumInfo.name)
+    //const spotifyTracks = albumInfo.tracks.items
+    console.log(`${artist}, ${album}`)
 
     const discogsResponse = await axios
       .get(
         'https://api.discogs.com/database/search', {
           params: {
-            artist,
+            q: `${artist}, ${album}`,
             type: 'master'
           },
           headers: REQUEST_HEADERS
@@ -32,7 +58,30 @@ const getOriginalAlbumTracks = async (albumId, token) => {
       )
 
     //console.log('Discogs album info in getOriginalTracks',discogsResponse.data.results[0])
-    discogsResponse.data.results.forEach(result => tracks.push(result))
+    discogsResponse.data.results.forEach(result => queryResults.push(result))
+    return Promise.resolve(queryResults)
+  }
+  catch(error) {
+    return Promise.reject(error)
+  }
+}
+
+// Gets the original album tracks from Discogs database with Discogs master id
+const getMasterTracks = async (masterId) => {
+  try {
+    if (!masterId) {
+      throw new Error(`Discogs master id is falsy: ${masterId}`)
+    }
+
+    const tracks = []
+    const discogsResponse = await axios
+      .get(
+        `https://api.discogs.com/masters/${masterId}`, {
+          headers: REQUEST_HEADERS
+        }
+      )
+
+    discogsResponse.data.tracklist.forEach(track => tracks.push(track.title))
     return Promise.resolve(tracks)
   }
   catch(error) {

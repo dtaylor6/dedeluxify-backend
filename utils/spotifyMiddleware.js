@@ -1,10 +1,8 @@
 const axios = require('axios')
 
-// Gets all of the album tracks and puts them in array req.tracks
 const getAlbumTracks = async (albumId, token) => {
-  const tracks = []
-
   try {
+    const tracks = []
     let spotifyResponse = await axios
       .get(
         `https://api.spotify.com/v1/albums/${albumId}/tracks`, {
@@ -17,7 +15,7 @@ const getAlbumTracks = async (albumId, token) => {
         }
       )
 
-    spotifyResponse.data.items.forEach(item => tracks.push(item))
+    spotifyResponse.data.items.forEach(item => tracks.push({ name: item.name, id: item.id }))
 
     // Due to limit of 50, we may have to call Spotify API multiple times to get all album tracks
     while (spotifyResponse.data.next !== null && spotifyResponse.data.next !== undefined) {
@@ -33,7 +31,7 @@ const getAlbumTracks = async (albumId, token) => {
           }
         )
 
-      spotifyResponse.data.items.forEach(item => tracks.push(item))
+      spotifyResponse.data.items.forEach(item => tracks.push({ name: item.name, id: item.id }))
     }
 
     return Promise.resolve(tracks)
