@@ -9,8 +9,10 @@ const getLettersDigitsSpaces = (str) => {
 const trimMusicString = (str) => {
   const searchTerms = ['deluxe', 'remaster', 'expand', 'edition']
   let newStr = getLettersDigitsSpaces(str)
+  const lowerStr = newStr.toLowerCase()
+
   searchTerms.forEach(term => {
-    const termIndex = newStr.toLowerCase().indexOf(term)
+    const termIndex = lowerStr.indexOf(term)
     if (termIndex > 0) {
       newStr = newStr.slice(0, termIndex)
     }
@@ -21,7 +23,19 @@ const trimMusicString = (str) => {
   return newStr
 }
 
+const combineTrackLists = (spotifyTracks, discogsTracks) => {
+  const tracks = []
+  const masterArray = discogsTracks.map(track => trimMusicString(track))
+
+  // tracks.forEach(track => {
+  //   discogsTracks
+  // })
+
+  return tracks
+}
+
 module.exports = {
   getLettersDigitsSpaces,
-  trimMusicString
+  trimMusicString,
+  combineTrackLists
 }

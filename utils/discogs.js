@@ -2,7 +2,7 @@ const axios = require('axios')
 
 const config = require('./config')
 const { trimMusicString } = require('./stringUtils')
-const { getAlbumInfo } = require('./spotifyMiddleware')
+const { getAlbumInfo } = require('./spotifyUtils')
 
 const discogs_client_id = config.DISCOGS_CLIENT_ID
 const discogs_secret = config.DISCOGS_SECRET
@@ -28,7 +28,6 @@ const getOriginalAlbumTracks = async (albumId, token) => {
       masterTracks.forEach(track => originalTracks.push(track))
     }
 
-    //console.log(originalTracks)
     return Promise.resolve(originalTracks)
   }
   catch(error) {
@@ -42,8 +41,6 @@ const queryMasters = async (albumInfo) => {
     const queryResults = []
     const artist = albumInfo.artists[0].name
     const album = trimMusicString(albumInfo.name)
-    //console.log('Before:', albumInfo.name)
-    //const spotifyTracks = albumInfo.tracks.items
     console.log(`${artist}, ${album}`)
 
     const discogsResponse = await axios
@@ -57,7 +54,6 @@ const queryMasters = async (albumInfo) => {
         }
       )
 
-    //console.log('Discogs album info in getOriginalTracks',discogsResponse.data.results[0])
     discogsResponse.data.results.forEach(result => queryResults.push(result))
     return Promise.resolve(queryResults)
   }

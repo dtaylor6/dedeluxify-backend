@@ -60,7 +60,13 @@ const getAlbumInfo = async (albumId, token) => {
   }
 }
 
+// TODO: complete this Spotify track queue function
+const queueTracks = (uris) => {
+  return Promise.resolve(uris)
+}
+
 module.exports = {
   getAlbumTracks,
-  getAlbumInfo
+  getAlbumInfo,
+  queueTracks
 }

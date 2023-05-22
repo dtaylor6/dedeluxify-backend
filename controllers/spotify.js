@@ -2,7 +2,8 @@ const axios = require('axios')
 const { getOriginalAlbumTracks } = require('../utils/discogs')
 const spotifyRouter = require('express').Router()
 
-const getAlbumTracks = require('../utils/spotifyMiddleware').getAlbumTracks
+const { getAlbumTracks, queueTracks } = require('../utils/spotifyUtils')
+const { combineTrackLists } = require('../utils/stringUtils')
 
 // Ensure a proper token is given for each request to this route
 spotifyRouter.use((req, res, next) => {
@@ -58,21 +59,24 @@ spotifyRouter.get('/play', async (req, res, next) => {
 
   try {
     // Execute both async functions in parallel
-    Promise.all([getAlbumTracks(albumId, token), getOriginalAlbumTracks(albumId, token)]).then((values) => {
-      console.log('In router spotifyRouter.get', values)
-    })
+    const trackPromise = await Promise
+      .all([
+        getAlbumTracks(albumId, token),
+        getOriginalAlbumTracks(albumId, token)
+      ])
+
+    console.log(trackPromise)
+    // May return an empty array
+    // const originalTracks = combineTrackLists(trackPromise[0], trackPromise[1])
+
+    // const response = (originalTracks.length > 0) ?
+    //   await queueTracks(originalTracks) :
+    //   await queueTracks(trackPromise[0])
   }
   catch(error) {
     next(error)
   }
 
-  // const spotifyTracks = req.spotifyTracks // From getAlbumTracks middleware
-  // const spotifyTrackNames = spotifyTracks.map(track => track.name)
-  // console.log('Track names:', spotifyTrackNames)
-
-  //const discogsTracks = req.discogsTracks // From getOriginalAlbumTracks middleware
-  //const discogsTrackNames = discogsTracks.map(track => track.name)
-  //console.log('Original track names:', discogsTrackNames)
   res.status(200).send()
 })
 

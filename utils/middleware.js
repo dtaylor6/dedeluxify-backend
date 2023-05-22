@@ -34,7 +34,6 @@ const errorHandler = (err, req, res, next) => {
     logger.error('Error', err.message)
     res.status(500).send('Something went wrong with the dedeluxify-backend')
   }
-  next()
 }
 
 module.exports = {
