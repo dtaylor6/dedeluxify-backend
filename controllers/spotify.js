@@ -67,7 +67,8 @@ spotifyRouter.get('/play', async (req, res, next) => {
 
     console.log(trackPromise)
     // May return an empty array
-    // const originalTracks = combineTrackLists(trackPromise[0], trackPromise[1])
+    const originalTracks = combineTrackLists(trackPromise[0], trackPromise[1])
+    console.log('Combined:', originalTracks)
 
     // const response = (originalTracks.length > 0) ?
     //   await queueTracks(originalTracks) :
