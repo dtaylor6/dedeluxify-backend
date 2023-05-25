@@ -65,20 +65,21 @@ spotifyRouter.get('/play', async (req, res, next) => {
         getOriginalAlbumTracks(albumId, token)
       ])
 
-    console.log(trackPromise)
+    const spotifyTracks = trackPromise[0]
+    const discogsTracks = trackPromise[1]
     // May return an empty array
-    const originalTracks = combineTrackLists(trackPromise[0], trackPromise[1])
-    console.log('Combined:', originalTracks)
+    const originalTracks = combineTrackLists(spotifyTracks, discogsTracks)
 
-    // const response = (originalTracks.length > 0) ?
-    //   await queueTracks(originalTracks) :
-    //   await queueTracks(trackPromise[0])
+    // Call Spotify middleware to queue original track list
+    const queueResponse = (originalTracks.length > 0) ?
+      await queueTracks(originalTracks, token) :
+      await queueTracks(spotifyTracks, token)
+
+    res.status(200).json(queueResponse)
   }
   catch(error) {
     next(error)
   }
-
-  res.status(200).send()
 })
 
 module.exports = spotifyRouter

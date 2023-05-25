@@ -41,7 +41,6 @@ const queryMasters = async (albumInfo) => {
     const queryResults = []
     const artist = albumInfo.artists[0].name
     const album = trimMusicString(albumInfo.name)
-    console.log(`${artist}, ${album}`)
 
     const discogsResponse = await axios
       .get(
