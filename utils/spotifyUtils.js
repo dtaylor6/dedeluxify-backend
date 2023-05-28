@@ -60,8 +60,9 @@ const getAlbumInfo = async (albumId, token) => {
   }
 }
 
-const queueTracks = async (tracks, token) => {
+const queueTracks = async (tracks, uri, token) => {
   const uris = tracks.map(track => track.uri)
+  console.log(tracks)
   const queuedTracks = tracks.map(track => track.name)
 
   try {

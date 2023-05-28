@@ -50,7 +50,8 @@ spotifyRouter.get('/search', (req, res, next) => {
 })
 
 spotifyRouter.get('/play', async (req, res, next) => {
-  const albumId = req.query.albumId
+  const uri = req.query.uri
+  const albumId = uri.split(':').at(-1) // Get album id from uri
   const token = req.token
 
   if (albumId === '') {
@@ -72,8 +73,8 @@ spotifyRouter.get('/play', async (req, res, next) => {
 
     // Call Spotify middleware to queue original track list
     const queueResponse = (originalTracks.length > 0) ?
-      await queueTracks(originalTracks, token) :
-      await queueTracks(spotifyTracks, token)
+      await queueTracks(originalTracks, uri, token) :
+      await queueTracks(spotifyTracks, uri, token)
 
     res.status(200).json(queueResponse)
   }
