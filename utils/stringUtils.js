@@ -32,7 +32,7 @@ const trimMusicString = (str) => {
 
 // Returns album string with extraneous terms truncated in lower case
 const trimMusicStringLower = (str) => {
-  const searchTerms = ['deluxe', 'remaster', 'expand', 'edition']
+  const searchTerms = ['deluxe', 'remaster', 'expand', 'edition', 'bonus']
   let newStr = getLettersDigitsSpaces(str)
   newStr = newStr.toLowerCase()
 

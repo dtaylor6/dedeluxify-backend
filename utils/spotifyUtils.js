@@ -60,7 +60,7 @@ const getAlbumInfo = async (albumId, token) => {
   }
 }
 
-const queueTracks = async (tracks, uri, token) => {
+const playTracks = async (tracks, uri, token) => {
   const uris = tracks.map(track => track.uri)
   console.log(tracks)
   const queuedTracks = tracks.map(track => track.name)
@@ -87,8 +87,40 @@ const queueTracks = async (tracks, uri, token) => {
   }
 }
 
+const queueTracks = async (tracks, uri, token) => {
+  const uris = tracks.map(track => track.uri)
+  console.log(tracks)
+  const queuedTracks = tracks.map(track => track.name)
+
+  try {
+    // Tracks have to be queued one at a time with current Spotify api
+    for (let i = 0; i < uris.length; ++i) {
+      await axios
+        .post(
+          'https://api.spotify.com/v1/me/player/queue',
+          {},
+          {
+            headers: {
+              'Authorization': token,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              'uri' : uris[i]
+            }
+          }
+        )
+      await new Promise(resolve => setTimeout(resolve, 500)) // Slow down api calls
+    }
+    return Promise.resolve(queuedTracks)
+  }
+  catch(error) {
+    return Promise.reject(error)
+  }
+}
+
 module.exports = {
   getAlbumTracks,
   getAlbumInfo,
+  playTracks,
   queueTracks
 }
