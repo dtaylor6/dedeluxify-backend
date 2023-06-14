@@ -36,7 +36,8 @@ trackPreferencesRouter.use(async (req, res, next) => {
   next()
 })
 
-trackPreferencesRouter.put('/set', async (req, res, next) => {
+// Get Spotify track list and corresponding preferences from db if they exist
+trackPreferencesRouter.get('/', async (req, res, next) => {
   const uri = req.query.uri
   const albumId = uri.split(':').at(-1) // Get album id from uri
   const token = req.token
