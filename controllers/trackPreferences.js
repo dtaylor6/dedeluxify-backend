@@ -63,4 +63,10 @@ trackPreferencesRouter.get('/', async (req, res, next) => {
   }
 })
 
+trackPreferencesRouter.post('/', async (req, res, next) => {
+  const uris = req.body.uris
+  console.log(uris)
+  res.status(200).send()
+})
+
 module.exports = trackPreferencesRouter
