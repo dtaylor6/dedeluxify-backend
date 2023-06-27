@@ -18,7 +18,7 @@ module.exports = {
         unique: false,
         allowNull: true
       }
-    })
+    });
   },
   down: async ({ context: queryInterface }) => {
     await queryInterface.dropTable('users');
