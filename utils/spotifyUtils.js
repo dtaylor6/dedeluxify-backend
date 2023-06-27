@@ -1,8 +1,8 @@
-const axios = require('axios')
+const axios = require('axios');
 
 const getAlbumTracks = async (albumId, token) => {
   try {
-    const tracks = []
+    const tracks = [];
     let spotifyResponse = await axios
       .get(
         `https://api.spotify.com/v1/albums/${albumId}/tracks`, {
@@ -13,9 +13,9 @@ const getAlbumTracks = async (albumId, token) => {
             'Authorization': token,
           }
         }
-      )
+      );
 
-    spotifyResponse.data.items.forEach(item => tracks.push({ name: item.name, uri: item.uri }))
+    spotifyResponse.data.items.forEach(item => tracks.push({ name: item.name, uri: item.uri }));
 
     // Due to limit of 50, we may have to call Spotify API multiple times to get all album tracks
     while (spotifyResponse.data.next !== null && spotifyResponse.data.next !== undefined) {
@@ -29,17 +29,17 @@ const getAlbumTracks = async (albumId, token) => {
               'Authorization': token,
             }
           }
-        )
+        );
 
-      spotifyResponse.data.items.forEach(item => tracks.push({ name: item.name, uri: item.uri }))
+      spotifyResponse.data.items.forEach(item => tracks.push({ name: item.name, uri: item.uri }));
     }
 
-    return Promise.resolve(tracks)
+    return Promise.resolve(tracks);
   }
   catch(error) {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-}
+};
 
 const getAlbumInfo = async (albumId, token) => {
   try {
@@ -51,19 +51,19 @@ const getAlbumInfo = async (albumId, token) => {
             'Authorization': token,
           }
         }
-      )
+      );
 
-    return Promise.resolve(spotifyResponse.data)
+    return Promise.resolve(spotifyResponse.data);
   }
   catch(error) {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-}
+};
 
 const playTracks = async (tracks, uri, token) => {
-  const uris = tracks.map(track => track.uri)
-  console.log(tracks)
-  const queuedTracks = tracks.map(track => track.name)
+  const uris = tracks.map(track => track.uri);
+  console.log(tracks);
+  const queuedTracks = tracks.map(track => track.name);
 
   try {
     await axios
@@ -78,19 +78,19 @@ const playTracks = async (tracks, uri, token) => {
             'Content-Type': 'application/json'
           }
         }
-      )
+      );
 
-    return Promise.resolve(queuedTracks)
+    return Promise.resolve(queuedTracks);
   }
   catch(error) {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-}
+};
 
 const queueTracks = async (tracks, uri, token) => {
-  const uris = tracks.map(track => track.uri)
-  console.log(tracks)
-  const queuedTracks = tracks.map(track => track.name)
+  const uris = tracks.map(track => track.uri);
+  console.log(tracks);
+  const queuedTracks = tracks.map(track => track.name);
 
   try {
     // Tracks have to be queued one at a time with current Spotify api
@@ -108,19 +108,19 @@ const queueTracks = async (tracks, uri, token) => {
               'uri' : uris[i]
             }
           }
-        )
-      await new Promise(resolve => setTimeout(resolve, 500)) // Slow down api calls
+        );
+      await new Promise(resolve => setTimeout(resolve, 500)); // Slow down api calls
     }
-    return Promise.resolve(queuedTracks)
+    return Promise.resolve(queuedTracks);
   }
   catch(error) {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-}
+};
 
 module.exports = {
   getAlbumTracks,
   getAlbumInfo,
   playTracks,
   queueTracks
-}
+};
