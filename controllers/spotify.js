@@ -1,32 +1,31 @@
-const axios = require('axios')
-const { getOriginalAlbumTracks } = require('../utils/discogs')
-const spotifyRouter = require('express').Router()
+const axios = require('axios');
+const { getOriginalAlbumTracks } = require('../utils/discogs');
+const spotifyRouter = require('express').Router();
 
-const { getAlbumTracks, playTracks, queueTracks } = require('../utils/spotifyUtils')
-const { combineTrackLists } = require('../utils/stringUtils')
+const { getAlbumTracks, playTracks, queueTracks } = require('../utils/spotifyUtils');
+const { combineTrackLists } = require('../utils/stringUtils');
 
 // Ensure a proper token is given for each request to this route
 spotifyRouter.use((req, res, next) => {
-  const auth = req.headers['authorization']
+  const auth = req.headers['authorization'];
 
   if (auth === '') {
-    return res.status(401).send('No Spotify auth token given in header')
+    return res.status(401).send('No Spotify auth token given in header');
   }
   else if (!auth.startsWith('Bearer ')) {
-    return res.status(401).send('Malformatted Spotify auth token given in \
-                                 header. Must be of format: Bearer <token>')
+    return res.status(401).send('Malformatted Spotify auth token given in header. Must be of format: Bearer <token>');
   }
 
-  req.token = auth
-  next()
-})
+  req.token = auth;
+  next();
+});
 
 spotifyRouter.get('/search', (req, res, next) => {
-  const query = req.query.q
+  const query = req.query.q;
 
   // Prevent empty query request to Spotify API
   if (query === '') {
-    return res.status(400).send('No search query')
+    return res.status(400).send('No search query');
   }
 
   axios
@@ -42,20 +41,22 @@ spotifyRouter.get('/search', (req, res, next) => {
       }
     )
     .then((response) => {
-      res.status(200).json(response.data.albums.items)
+      res.status(200).json(response.data.albums.items);
     })
     .catch ((error) => {
-      next(error)
-    })
-})
+      next(error);
+    });
+});
 
 spotifyRouter.get('/play', async (req, res, next) => {
-  const uri = req.query.uri
-  const albumId = uri.split(':').at(-1) // Get album id from uri
-  const token = req.token
+  const uri = req.query.uri;
+  const token = req.token;
+
+  // Get album id from uri
+  const albumId = uri.split(':').at(-1);
 
   if (albumId === '') {
-    return res.status(400).send('No album id specified')
+    return res.status(400).send('No album id specified');
   }
 
   try {
@@ -64,32 +65,35 @@ spotifyRouter.get('/play', async (req, res, next) => {
       .all([
         getAlbumTracks(albumId, token),
         getOriginalAlbumTracks(albumId, token)
-      ])
+      ]);
 
-    const spotifyTracks = trackPromise[0]
-    const discogsTracks = trackPromise[1]
+    const spotifyTracks = trackPromise[0];
+    const discogsTracks = trackPromise[1];
+
     // May return an empty array
-    const masterTracks = combineTrackLists(spotifyTracks, discogsTracks)
+    const masterTracks = combineTrackLists(spotifyTracks, discogsTracks);
 
     // Call Spotify middleware to play original track list
     const queueResponse = (masterTracks.length > 0) ?
       await playTracks(masterTracks, uri, token) :
-      await playTracks(spotifyTracks, uri, token)
+      await playTracks(spotifyTracks, uri, token);
 
-    res.status(200).json(queueResponse)
+    res.status(200).json(queueResponse);
   }
   catch(error) {
-    next(error)
+    next(error);
   }
-})
+});
 
 spotifyRouter.get('/queue', async (req, res, next) => {
-  const uri = req.query.uri
-  const albumId = uri.split(':').at(-1) // Get album id from uri
-  const token = req.token
+  const uri = req.query.uri;
+  const token = req.token;
+
+  // Get album id from uri
+  const albumId = uri.split(':').at(-1);
 
   if (albumId === '') {
-    return res.status(400).send('No album id specified')
+    return res.status(400).send('No album id specified');
   }
 
   try {
@@ -98,23 +102,23 @@ spotifyRouter.get('/queue', async (req, res, next) => {
       .all([
         getAlbumTracks(albumId, token),
         getOriginalAlbumTracks(albumId, token)
-      ])
+      ]);
 
-    const spotifyTracks = trackPromise[0]
-    const discogsTracks = trackPromise[1]
+    const spotifyTracks = trackPromise[0];
+    const discogsTracks = trackPromise[1];
     // May return an empty array
-    const masterTracks = combineTrackLists(spotifyTracks, discogsTracks)
+    const masterTracks = combineTrackLists(spotifyTracks, discogsTracks);
 
     // Call Spotify middleware to queue original track list
     const queueResponse = (masterTracks.length > 0) ?
       await queueTracks(masterTracks, uri, token) :
-      await queueTracks(spotifyTracks, uri, token)
+      await queueTracks(spotifyTracks, uri, token);
 
-    res.status(200).json(queueResponse)
+    res.status(200).json(queueResponse);
   }
   catch(error) {
-    next(error)
+    next(error);
   }
-})
+});
 
-module.exports = spotifyRouter
+module.exports = spotifyRouter;

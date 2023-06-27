@@ -24,7 +24,7 @@ module.exports = {
     ],
     'semi': [
       'error',
-      'never'
+      'always'
     ],
     'eqeqeq': 'error',
     'no-trailing-spaces': 'error',
