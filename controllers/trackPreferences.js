@@ -3,15 +3,17 @@ const trackPreferencesRouter = require('express').Router()
 
 const { getAlbumTracks } = require('../utils/spotifyUtils')
 
-// Fetch user email for database authentication
+const { User } = require('../models')
+
+// Fetch Spotify id with token for database authentication
 trackPreferencesRouter.use(async (req, res, next) => {
   const auth = req.headers['authorization']
 
   if (auth === '') {
-    return res.status(401).send('No Spotify auth token given in header')
+    return res.status(403).send('No Spotify auth token given in header')
   }
   else if (!auth.startsWith('Bearer ')) {
-    return res.status(401).send('Malformatted Spotify auth token given in \
+    return res.status(403).send('Malformatted Spotify auth token given in \
                                  header. Must be of format: Bearer <token>')
   }
   else {
@@ -19,7 +21,7 @@ trackPreferencesRouter.use(async (req, res, next) => {
   }
 
   try {
-    const spotifyUser = await axios
+    const spotifyResponse = await axios
       .get(
         'https://api.spotify.com/v1/me', {
           headers: {
@@ -28,13 +30,21 @@ trackPreferencesRouter.use(async (req, res, next) => {
         }
       )
 
-    req.spotifyUser = spotifyUser
+    req.spotifyUser = spotifyResponse.data
   }
   catch(error) {
     next(error)
   }
   next()
 })
+
+const findUser = async (req, res, next) => {
+  const spotifyId = req.spotifyUser.id
+  if (!spotifyId) {
+    res.status(401).send('The server encountered an error authenticating through Spotify')
+  }
+  req.user = await User.findOne({ where: { spotifyId: spotifyId } })
+}
 
 // Get Spotify track list and corresponding preferences from db if they exist
 trackPreferencesRouter.get('/', async (req, res, next) => {
@@ -64,6 +74,25 @@ trackPreferencesRouter.get('/', async (req, res, next) => {
 })
 
 trackPreferencesRouter.post('/', async (req, res, next) => {
+  const spotifyId = req.spotifyUser.id
+  const displayName = req.spotifyUser.display_name
+  if (!spotifyId) {
+    res.status(401).send('The server encountered an error authenticating through Spotify')
+  }
+
+  try {
+    req.user = await User.findOrCreate({
+      where: { spotifyId },
+      defaults: {
+        spotifyId,
+        displayName
+      }
+    })
+  }
+  catch(error) {
+    next(error)
+  }
+
   const uris = req.body.uris
   res.status(200).send()
 })
