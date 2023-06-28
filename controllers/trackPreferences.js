@@ -38,10 +38,27 @@ trackPreferencesRouter.use(async (req, res, next) => {
   next();
 });
 
+const albumIdExtractor = (req, res, next) => {
+  const uri = req.body.uri || req.query.uri;
+  if (!uri) {
+    return res.status(400).send('No Spotify URI given');
+  }
+  else if (!uri.startsWith('spotify:album:')) {
+    return res.status(400).send('Spotify URI must be for an album');
+  }
+
+  req.albumId = uri.split(':').at(-1);
+  if (req.albumId === '') {
+    return res.status(400).send('No album id specified');
+  }
+
+  next();
+};
+
 const findUser = async (req, res, next) => {
   const spotifyId = req.spotifyUser.id;
   if (!spotifyId) {
-    res.status(401).send('The server encountered an error authenticating through Spotify');
+    return res.status(401).send('The server encountered an error authenticating through Spotify');
   }
 
   try {
@@ -55,16 +72,9 @@ const findUser = async (req, res, next) => {
 };
 
 // Get Spotify track list and corresponding preferences from db if they exist
-trackPreferencesRouter.get('/', findUser, async (req, res, next) => {
-  const uri = req.query.uri;
+trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
+  const albumId = req.albumId;
   const token = req.token;
-
-  // Get album id from uri
-  const albumId = uri.split(':').at(-1);
-
-  if (albumId === '') {
-    return res.status(400).send('No album id specified');
-  }
 
   try {
     // Execute both async functions in parallel
@@ -83,15 +93,15 @@ trackPreferencesRouter.get('/', findUser, async (req, res, next) => {
   }
 });
 
-trackPreferencesRouter.post('/', async (req, res, next) => {
+trackPreferencesRouter.post('/', albumIdExtractor, async (req, res, next) => {
   const spotifyId = req.spotifyUser.id;
   const displayName = req.spotifyUser.display_name;
   if (!spotifyId) {
-    res.status(401).send('The server encountered an error authenticating through Spotify');
+    return res.status(401).send('The server encountered an error authenticating through Spotify');
   }
 
   try {
-    req.user = await user.findOrCreate({
+    [req.user] = await user.findOrCreate({
       where: { spotify_id: spotifyId },
       defaults: {
         spotify_id: spotifyId,
@@ -103,8 +113,22 @@ trackPreferencesRouter.post('/', async (req, res, next) => {
     next(error);
   }
 
-  const uris = req.body.uris;
-  res.status(200).send();
+  const albumId = req.albumId;
+  const numTracks = req.body.numTracks;
+  const preferences = req.body.preferences;
+
+  try {
+    const newPreference = await album_preference.create({
+      uri: albumId,
+      num_tracks: numTracks,
+      track_preferences: preferences,
+      user_id: req.user.id
+    });
+    res.status(200).json(newPreference);
+  }
+  catch(error) {
+    next(error);
+  }
 });
 
 export default trackPreferencesRouter;
