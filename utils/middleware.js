@@ -33,7 +33,7 @@ const errorHandler = (err, req, res, next) => {
     // Something happened in setting up the request that triggered an Error
     error('Error', err.message);
     res.status(500).send('Something went wrong with the dedeluxify-backend');
-    next();
+    next(err);
   }
 };
 
