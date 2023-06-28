@@ -1,6 +1,10 @@
 import user from './user.js';
-// const AlbumPreference = require('./album_preference')
+import album_preference from './album_preference.js';
 
-// TODO: Table relations go here
+user.hasMany(album_preference);
+album_preference.belongsTo(user);
 
-export default user;
+export {
+  user,
+  album_preference
+};

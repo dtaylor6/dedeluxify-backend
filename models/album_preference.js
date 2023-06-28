@@ -27,8 +27,7 @@ album_preference.init({
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
-      is: /^[01]+$/g,
-      len: this.num_tracks
+      is: /^[01]+$/g
     }
   }
 },
@@ -37,6 +36,16 @@ album_preference.init({
   underscored: true,
   timestamps: false,
   modelName: 'album_preference'
-});
+},
+{
+  validate: {
+    numPreferencesMatchesNumTracks() {
+      if (this.num_tracks !== this.track_preferences.length) {
+        throw new Error('Number of track preferences set must match the number of tracks in the album!');
+      }
+    }
+  }
+}
+);
 
 export default album_preference;
