@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const getAlbumTracks = async (albumId, token) => {
+const getAlbumTracks = async (albumId, token) => {
   try {
     const tracks = [];
     let spotifyResponse = await axios
@@ -41,7 +41,7 @@ export const getAlbumTracks = async (albumId, token) => {
   }
 };
 
-export const getAlbumInfo = async (albumId, token) => {
+const getAlbumInfo = async (albumId, token) => {
   try {
     let spotifyResponse = await axios
       .get(
@@ -60,7 +60,7 @@ export const getAlbumInfo = async (albumId, token) => {
   }
 };
 
-export const playTracks = async (tracks, uri, token) => {
+const playTracks = async (tracks, uri, token) => {
   const uris = tracks.map(track => track.uri);
   console.log(tracks);
   const queuedTracks = tracks.map(track => track.name);
@@ -87,7 +87,7 @@ export const playTracks = async (tracks, uri, token) => {
   }
 };
 
-export const queueTracks = async (tracks, uri, token) => {
+const queueTracks = async (tracks, uri, token) => {
   const uris = tracks.map(track => track.uri);
   console.log(tracks);
   const queuedTracks = tracks.map(track => track.name);
@@ -116,4 +116,11 @@ export const queueTracks = async (tracks, uri, token) => {
   catch(error) {
     return Promise.reject(error);
   }
+};
+
+export {
+  getAlbumTracks,
+  getAlbumInfo,
+  playTracks,
+  queueTracks
 };

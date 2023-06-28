@@ -1,19 +1,19 @@
 // Returns a new string consisting of only unicode letters and unicode digits
-export const getLettersDigits = (str) => {
+const getLettersDigits = (str) => {
   const regex = /[^\p{L}\p{N}]+/gu;
   const newString = str.replace(regex, '');
   return newString;
 };
 
 // Returns a new string consisting of only unicode letters, unicode digits, and spaces
-export const getLettersDigitsSpaces = (str) => {
+const getLettersDigitsSpaces = (str) => {
   const regex = /[^\p{L}\p{N}\s]+/gu;
   const newString = str.replace(regex, '');
   return newString;
 };
 
 // Returns album string with extraneous terms truncated
-export const trimMusicString = (str) => {
+const trimMusicString = (str) => {
   const searchTerms = ['deluxe', 'remaster', 'expand', 'edition'];
   let newStr = getLettersDigitsSpaces(str);
   const lowerStr = newStr.toLowerCase();
@@ -31,7 +31,7 @@ export const trimMusicString = (str) => {
 };
 
 // Returns album string with extraneous terms truncated in lower case
-export const trimMusicStringLower = (str) => {
+const trimMusicStringLower = (str) => {
   const searchTerms = ['deluxe', 'remaster', 'expand', 'edition', 'bonus'];
   let newStr = getLettersDigitsSpaces(str);
   newStr = newStr.toLowerCase();
@@ -48,7 +48,7 @@ export const trimMusicStringLower = (str) => {
   return newStr;
 };
 
-export const combineTrackLists = (spotifyTracks, discogsTracks) => {
+const combineTrackLists = (spotifyTracks, discogsTracks) => {
   const tracks = [];
   const masterTracks = discogsTracks
     .map(track => getLettersDigits(trimMusicStringLower(track)));
@@ -70,4 +70,12 @@ export const combineTrackLists = (spotifyTracks, discogsTracks) => {
   }
 
   return tracks;
+};
+
+export {
+  getLettersDigits,
+  getLettersDigitsSpaces,
+  trimMusicString,
+  trimMusicStringLower,
+  combineTrackLists
 };

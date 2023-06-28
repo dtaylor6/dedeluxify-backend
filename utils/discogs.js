@@ -14,7 +14,7 @@ const REQUEST_HEADERS = {
 
 // Queries Discogs for master based on Spotify album info and returns the tracks.
 // May return an empty array in the case of empty Discogs query results.
-export const getOriginalAlbumTracks = async (albumId, token) => {
+const getOriginalAlbumTracks = async (albumId, token) => {
   try {
     const originalTracks = [];
 
@@ -83,3 +83,5 @@ const getMasterTracks = async (masterId) => {
     return Promise.reject(error);
   }
 };
+
+export default getOriginalAlbumTracks;

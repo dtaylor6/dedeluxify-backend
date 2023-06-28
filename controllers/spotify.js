@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getOriginalAlbumTracks } from '../utils/discogs.js';
+import getOriginalAlbumTracks from '../utils/discogs.js';
 import { Router } from 'express';
 const spotifyRouter = Router();
 

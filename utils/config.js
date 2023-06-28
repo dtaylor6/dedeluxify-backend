@@ -1,13 +1,23 @@
 import { config } from 'dotenv';
 config();
 
-export const PORT = process.env.PORT;
-export const FRONTEND_PORT = process.env.FRONTEND_PORT;
+const PORT = process.env.PORT;
+const FRONTEND_PORT = process.env.FRONTEND_PORT;
 
-export const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-export const SPOTIFY_SECRET = process.env.SPOTIFY_SECRET;
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+const SPOTIFY_SECRET = process.env.SPOTIFY_SECRET;
 
-export const DISCOGS_CLIENT_ID = process.env.DISCOGS_CLIENT_ID;
-export const DISCOGS_SECRET = process.env.DISCOGS_SECRET;
+const DISCOGS_CLIENT_ID = process.env.DISCOGS_CLIENT_ID;
+const DISCOGS_SECRET = process.env.DISCOGS_SECRET;
 
-export const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL = process.env.DATABASE_URL;
+
+export {
+  PORT,
+  FRONTEND_PORT,
+  SPOTIFY_CLIENT_ID,
+  SPOTIFY_SECRET,
+  DISCOGS_CLIENT_ID,
+  DISCOGS_SECRET,
+  DATABASE_URL
+};

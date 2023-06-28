@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 
-export async function up({ context: queryInterface }) {
+async function up({ context: queryInterface }) {
   await queryInterface.createTable('users', {
     id: {
       type: DataTypes.INTEGER,
@@ -19,6 +19,11 @@ export async function up({ context: queryInterface }) {
     }
   });
 }
-export async function down({ context: queryInterface }) {
+async function down({ context: queryInterface }) {
   await queryInterface.dropTable('users');
 }
+
+export {
+  up,
+  down
+};

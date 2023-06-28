@@ -4,7 +4,7 @@ import { Umzug, SequelizeStorage } from 'umzug';
 import { DATABASE_URL } from './config.js';
 import { info, error } from './logger.js';
 
-export const sequelize = new Sequelize(DATABASE_URL, {
+const sequelize = new Sequelize(DATABASE_URL, {
   dialectOptions: {
     ssl: {
       require: true
@@ -12,7 +12,7 @@ export const sequelize = new Sequelize(DATABASE_URL, {
   },
 });
 
-export const migrationConf = {
+const migrationConf = {
   migrations: {
     glob: 'migrations/*.js',
   },
@@ -21,7 +21,7 @@ export const migrationConf = {
   logger: console, // TODO: Give this a better logging solutiuon
 };
 
-export const runMigrations = async () => {
+const runMigrations = async () => {
   const migrator = new Umzug(migrationConf);
   const migrations = await migrator.up();
   info('Migrations up to date', {
@@ -29,13 +29,13 @@ export const runMigrations = async () => {
   });
 };
 
-export const rollbackMigration = async () => {
+const rollbackMigration = async () => {
   await sequelize.authenticate();
   const migrator = new Umzug(migrationConf);
   await migrator.down();
 };
 
-export const connectToDatabase = async () => {
+const connectToDatabase = async () => {
   try {
     await sequelize.authenticate();
     await runMigrations();
@@ -48,4 +48,12 @@ export const connectToDatabase = async () => {
   }
 
   return null;
+};
+
+export {
+  sequelize,
+  migrationConf,
+  runMigrations,
+  rollbackMigration,
+  connectToDatabase
 };
