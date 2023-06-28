@@ -2,25 +2,28 @@ const { DataTypes } = require('sequelize');
 
 module.exports = {
   up: async ({ context: queryInterface }) => {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('album_preferences', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
-      spotify_id: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: false
-      },
-      display_name: {
+      uri: {
         type: DataTypes.STRING,
         unique: false,
-        allowNull: true
+        allowNull: false
+      },
+      num_tracks: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      track_preferences: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     });
   },
   down: async ({ context: queryInterface }) => {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('album_preferences');
   }
 };

@@ -43,11 +43,17 @@ const findUser = async (req, res, next) => {
   if (!spotifyId) {
     res.status(401).send('The server encountered an error authenticating through Spotify');
   }
-  req.user = await User.findOne({ where: { spotifyId: spotifyId } });
+
+  try {
+    req.user = await User.findOne({ where: { spotifyId: spotifyId } });
+  }
+  catch(error) {
+    next(error);
+  }
 };
 
 // Get Spotify track list and corresponding preferences from db if they exist
-trackPreferencesRouter.get('/', async (req, res, next) => {
+trackPreferencesRouter.get('/', findUser, async (req, res, next) => {
   const uri = req.query.uri;
   const token = req.token;
 
