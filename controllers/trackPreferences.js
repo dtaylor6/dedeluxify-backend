@@ -4,7 +4,7 @@ const trackPreferencesRouter = Router();
 
 import { getAlbumTracks } from '../utils/spotifyUtils.js';
 
-import User from '../models/index.js';
+import user from '../models/index.js';
 
 // Fetch Spotify id with token for database authentication
 trackPreferencesRouter.use(async (req, res, next) => {
@@ -45,11 +45,13 @@ const findUser = async (req, res, next) => {
   }
 
   try {
-    req.user = await User.findOne({ where: { spotifyId: spotifyId } });
+    req.user = await user.findOne({ where: { spotify_id: spotifyId } });
   }
   catch(error) {
     next(error);
   }
+
+  next();
 };
 
 // Get Spotify track list and corresponding preferences from db if they exist
@@ -89,11 +91,11 @@ trackPreferencesRouter.post('/', async (req, res, next) => {
   }
 
   try {
-    req.user = await User.findOrCreate({
-      where: { spotifyId },
+    req.user = await user.findOrCreate({
+      where: { spotify_id: spotifyId },
       defaults: {
-        spotifyId,
-        displayName
+        spotify_id: spotifyId,
+        display_name: displayName
       }
     });
   }

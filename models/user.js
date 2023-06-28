@@ -2,20 +2,20 @@ import { Model, DataTypes } from 'sequelize';
 
 import { sequelize } from '../utils/db.js';
 
-class User extends Model {}
+class user extends Model {}
 
-User.init({
+user.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  spotifyId: {
+  spotify_id: {
     type: DataTypes.STRING,
     unique: true,
     allowNull: false
   },
-  displayName: {
+  display_name: {
     type: DataTypes.STRING,
     unique: false,
     allowNull: true
@@ -28,4 +28,4 @@ User.init({
   modelName: 'user'
 });
 
-export default User;
+export default user;
