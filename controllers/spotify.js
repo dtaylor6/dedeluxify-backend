@@ -1,9 +1,10 @@
-const axios = require('axios');
-const { getOriginalAlbumTracks } = require('../utils/discogs');
-const spotifyRouter = require('express').Router();
+import axios from 'axios';
+import { getOriginalAlbumTracks } from '../utils/discogs.js';
+import { Router } from 'express';
+const spotifyRouter = Router();
 
-const { getAlbumTracks, playTracks, queueTracks } = require('../utils/spotifyUtils');
-const { combineTrackLists } = require('../utils/stringUtils');
+import { getAlbumTracks, playTracks, queueTracks } from '../utils/spotifyUtils.js';
+import { combineTrackLists } from '../utils/stringUtils.js';
 
 // Ensure a proper token is given for each request to this route
 spotifyRouter.use((req, res, next) => {
@@ -121,4 +122,4 @@ spotifyRouter.get('/queue', async (req, res, next) => {
   }
 });
 
-module.exports = spotifyRouter;
+export default spotifyRouter;

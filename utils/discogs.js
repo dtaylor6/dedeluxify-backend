@@ -1,11 +1,11 @@
-const axios = require('axios');
+import axios from 'axios';
 
-const config = require('./config');
-const { trimMusicString } = require('./stringUtils');
-const { getAlbumInfo } = require('./spotifyUtils');
+import { DISCOGS_CLIENT_ID, DISCOGS_SECRET } from './config.js';
+import { trimMusicString } from './stringUtils.js';
+import { getAlbumInfo } from './spotifyUtils.js';
 
-const discogs_client_id = config.DISCOGS_CLIENT_ID;
-const discogs_secret = config.DISCOGS_SECRET;
+const discogs_client_id = DISCOGS_CLIENT_ID;
+const discogs_secret = DISCOGS_SECRET;
 
 const REQUEST_HEADERS = {
   'Authorization': `Discogs key=${discogs_client_id}, secret=${discogs_secret}`,
@@ -14,7 +14,7 @@ const REQUEST_HEADERS = {
 
 // Queries Discogs for master based on Spotify album info and returns the tracks.
 // May return an empty array in the case of empty Discogs query results.
-const getOriginalAlbumTracks = async (albumId, token) => {
+export const getOriginalAlbumTracks = async (albumId, token) => {
   try {
     const originalTracks = [];
 
@@ -82,8 +82,4 @@ const getMasterTracks = async (masterId) => {
   catch(error) {
     return Promise.reject(error);
   }
-};
-
-module.exports = {
-  getOriginalAlbumTracks
 };

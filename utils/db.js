@@ -1,10 +1,10 @@
-const Sequelize = require('sequelize');
-const { Umzug, SequelizeStorage } = require('umzug');
+import Sequelize from 'sequelize';
+import { Umzug, SequelizeStorage } from 'umzug';
 
-const { DATABASE_URL } = require('./config');
-const logger = require('./logger');
+import { DATABASE_URL } from './config.js';
+import { info, error } from './logger.js';
 
-const sequelize = new Sequelize(DATABASE_URL, {
+export const sequelize = new Sequelize(DATABASE_URL, {
   dialectOptions: {
     ssl: {
       require: true
@@ -12,7 +12,7 @@ const sequelize = new Sequelize(DATABASE_URL, {
   },
 });
 
-const migrationConf = {
+export const migrationConf = {
   migrations: {
     glob: 'migrations/*.js',
   },
@@ -21,33 +21,31 @@ const migrationConf = {
   logger: console, // TODO: Give this a better logging solutiuon
 };
 
-const runMigrations = async () => {
+export const runMigrations = async () => {
   const migrator = new Umzug(migrationConf);
   const migrations = await migrator.up();
-  logger.info('Migrations up to date', {
+  info('Migrations up to date', {
     files: migrations.map((mig) => mig.name),
   });
 };
 
-const rollbackMigration = async () => {
+export const rollbackMigration = async () => {
   await sequelize.authenticate();
   const migrator = new Umzug(migrationConf);
   await migrator.down();
 };
 
-const connectToDatabase = async () => {
+export const connectToDatabase = async () => {
   try {
     await sequelize.authenticate();
     await runMigrations();
-    logger.info('Database connected');
+    info('Database connected');
   }
   catch (err) {
-    logger.error('Failed to connect to database');
-    logger.error(err);
+    error('Failed to connect to database');
+    error(err);
     return process.exit(1);
   }
 
   return null;
 };
-
-module.exports = { connectToDatabase, sequelize };

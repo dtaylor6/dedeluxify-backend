@@ -1,25 +1,27 @@
-const request = require('request');
-const spotifyAuthRouter = require('express').Router();
-const config = require('../utils/config');
-const querystring = require('node:querystring');
-const crypto = require('node:crypto');
+import pkg from 'request';
+import { Router } from 'express';
+const spotifyAuthRouter = Router();
 
-const spotify_client_id = config.SPOTIFY_CLIENT_ID;
-const spotify_client_secret = config.SPOTIFY_SECRET;
-const port = config.PORT;
-const frontend_port = config.FRONTEND_PORT;
+import { SPOTIFY_CLIENT_ID, SPOTIFY_SECRET, PORT, FRONTEND_PORT } from '../utils/config.js';
+import { stringify } from 'node:querystring';
+import { randomBytes } from 'node:crypto';
+
+const spotify_client_id = SPOTIFY_CLIENT_ID;
+const spotify_client_secret = SPOTIFY_SECRET;
+const port = PORT;
+const frontend_port = FRONTEND_PORT;
 
 const redirect_uri = `http://localhost:${port}/api/spotify/callback`;
 const stateKey = 'spotify_auth_state';
 
 spotifyAuthRouter.get('/login', (req, res) => {
-  const state = crypto.randomBytes(64).toString('hex');
+  const state = randomBytes(64).toString('hex');
   res.cookie(stateKey, state);
 
   const scope = 'streaming user-read-private user-read-email user-modify-playback-state';
 
   res.redirect('https://accounts.spotify.com/authorize?' +
-    querystring.stringify({
+    stringify({
       response_type: 'code',
       client_id: spotify_client_id,
       scope: scope,
@@ -36,7 +38,7 @@ spotifyAuthRouter.get('/callback', (req, res) => {
 
   if (state === null || state !== storedState) {
     return res.redirect('/#' +
-      querystring.stringify({
+      stringify({
         error: 'state_mismatch'
       }));
   }
@@ -56,19 +58,19 @@ spotifyAuthRouter.get('/callback', (req, res) => {
     };
   }
 
-  request.post(authOptions, function(error, response, body) {
+  pkg.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       const access_token = body.access_token;
 
       return res.redirect(`http://localhost:${frontend_port}/login?` +
-        querystring.stringify({
+        stringify({
           access_token: access_token
           //refresh_token: refresh_token
         }));
     }
     else {
       return res.redirect('/#' +
-        querystring.stringify({
+        stringify({
           error: 'invalid_token'
         })
       );
@@ -76,4 +78,4 @@ spotifyAuthRouter.get('/callback', (req, res) => {
   });
 });
 
-module.exports = spotifyAuthRouter;
+export default spotifyAuthRouter;

@@ -1,15 +1,15 @@
-const app = require('./app');
-const http = require('http');
-const config = require('./utils/config');
-const logger = require('./utils/logger');
+import app from './app.js';
+import { createServer } from 'http';
+import { PORT } from './utils/config.js';
+import { info } from './utils/logger.js';
 
-const server = http.createServer(app);
-const { connectToDatabase } = require('./utils/db');
+const server = createServer(app);
+import { connectToDatabase } from './utils/db.js';
 
 const start = async () => {
   await connectToDatabase();
-  server.listen(config.PORT, () => {
-    logger.info(`Dedeluxify backend server running on port ${config.PORT}`);
+  server.listen(PORT, () => {
+    info(`Dedeluxify backend server running on port ${PORT}`);
   });
 };
 

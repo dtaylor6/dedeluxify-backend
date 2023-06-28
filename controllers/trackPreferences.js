@@ -1,9 +1,10 @@
-const axios = require('axios');
-const trackPreferencesRouter = require('express').Router();
+import axios from 'axios';
+import { Router } from 'express';
+const trackPreferencesRouter = Router();
 
-const { getAlbumTracks } = require('../utils/spotifyUtils');
+import { getAlbumTracks } from '../utils/spotifyUtils.js';
 
-const { User } = require('../models');
+import User from '../models/index.js';
 
 // Fetch Spotify id with token for database authentication
 trackPreferencesRouter.use(async (req, res, next) => {
@@ -98,4 +99,4 @@ trackPreferencesRouter.post('/', async (req, res, next) => {
   res.status(200).send();
 });
 
-module.exports = trackPreferencesRouter;
+export default trackPreferencesRouter;
