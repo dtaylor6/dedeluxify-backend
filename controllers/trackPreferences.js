@@ -5,6 +5,7 @@ const trackPreferencesRouter = Router();
 import { getAlbumTracks } from '../utils/spotifyUtils.js';
 
 import { user, album_preference } from '../models/index.js';
+import { findUser, findOrCreateUser } from '../utils/dbUser.js';
 
 // Fetch Spotify id with token for database authentication
 trackPreferencesRouter.use(async (req, res, next) => {
@@ -55,22 +56,6 @@ const albumIdExtractor = (req, res, next) => {
   next();
 };
 
-const findUser = async (req, res, next) => {
-  const spotifyId = req.spotifyUser.id;
-  if (!spotifyId) {
-    return res.status(401).send('The server encountered an error authenticating through Spotify');
-  }
-
-  try {
-    req.user = await user.findOne({ where: { spotify_id: spotifyId } });
-  }
-  catch(error) {
-    next(error);
-  }
-
-  next();
-};
-
 // Get Spotify track list and corresponding preferences from db if they exist
 trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
   const albumId = req.albumId;
@@ -93,26 +78,7 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
   }
 });
 
-trackPreferencesRouter.post('/', albumIdExtractor, async (req, res, next) => {
-  const spotifyId = req.spotifyUser.id;
-  const displayName = req.spotifyUser.display_name;
-  if (!spotifyId) {
-    return res.status(401).send('The server encountered an error authenticating through Spotify');
-  }
-
-  try {
-    [req.user] = await user.findOrCreate({
-      where: { spotify_id: spotifyId },
-      defaults: {
-        spotify_id: spotifyId,
-        display_name: displayName
-      }
-    });
-  }
-  catch(error) {
-    next(error);
-  }
-
+trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (req, res, next) => {
   const albumId = req.albumId;
   const numTracks = req.body.numTracks;
   const preferences = req.body.preferences;
