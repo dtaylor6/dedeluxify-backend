@@ -5,7 +5,7 @@ const trackPreferencesRouter = Router();
 import { getAlbumTracks } from '../utils/spotifyUtils.js';
 
 import { user, album_preference } from '../models/index.js';
-import { findUser, findOrCreateUser } from '../utils/dbUser.js';
+import { findUser, findOrCreateUser } from '../utils/dbMiddleware.js';
 
 // Fetch Spotify id with token for database authentication
 trackPreferencesRouter.use(async (req, res, next) => {
