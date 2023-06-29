@@ -78,13 +78,15 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
   }
 });
 
+// Post/update track preferences for the corresponding Spotify album
 trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (req, res, next) => {
   const albumId = req.albumId;
   const numTracks = req.body.numTracks;
   const preferences = req.body.preferences;
 
   try {
-    const newPreference = await album_preference.upsert({
+    // Create or update album preference
+    const [newPreference] = await album_preference.upsert({
       album_id: albumId,
       user_id: req.user.id,
       num_tracks: numTracks,
