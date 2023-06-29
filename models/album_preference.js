@@ -5,15 +5,23 @@ import { sequelize } from '../utils/db.js';
 class album_preference extends Model {}
 
 album_preference.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  uri: {
+  album_id: {
     type: DataTypes.STRING,
+    primaryKey: true,
     unique: false,
     allowNull: false
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    references: {
+      model: 'users',
+      key: 'id',
+      as: 'user_id'
+    }
   },
   num_tracks: {
     type: DataTypes.INTEGER,

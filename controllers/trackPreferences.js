@@ -84,11 +84,11 @@ trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (re
   const preferences = req.body.preferences;
 
   try {
-    const newPreference = await album_preference.create({
-      uri: albumId,
+    const newPreference = await album_preference.upsert({
+      album_id: albumId,
+      user_id: req.user.id,
       num_tracks: numTracks,
-      track_preferences: preferences,
-      user_id: req.user.id
+      track_preferences: preferences
     });
     res.status(200).json(newPreference);
   }
