@@ -1,4 +1,4 @@
-import { user } from '../models/index.js';
+import { user, album_preference } from '../models/index.js';
 
 const findUser = async (req, res, next) => {
   const spotifyId = req.spotifyUser.id;
@@ -39,7 +39,24 @@ const findOrCreateUser = async (req, res, next) => {
   next();
 };
 
+const getAlbumPreference = async (albumId, userId) => {
+  try {
+    const preference = await album_preference.findOne({
+      where: {
+        album_id: albumId,
+        user_id: userId
+      }
+    });
+
+    return Promise.resolve(preference);
+  }
+  catch(error) {
+    return Promise.reject(error);
+  }
+};
+
 export {
   findUser,
-  findOrCreateUser
+  findOrCreateUser,
+  getAlbumPreference
 };

@@ -4,8 +4,8 @@ const trackPreferencesRouter = Router();
 
 import { getAlbumTracks } from '../utils/spotifyUtils.js';
 
-import { user, album_preference } from '../models/index.js';
-import { findUser, findOrCreateUser } from '../utils/dbMiddleware.js';
+import { album_preference } from '../models/index.js';
+import { findUser, findOrCreateUser, getAlbumPreference } from '../utils/dbMiddleware.js';
 
 // Fetch Spotify id with token for database authentication
 trackPreferencesRouter.use(async (req, res, next) => {
@@ -58,20 +58,40 @@ const albumIdExtractor = (req, res, next) => {
 
 // Get Spotify track list and corresponding preferences from db if they exist
 trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
-  const albumId = req.albumId;
-  const token = req.token;
-
   try {
     // Execute both async functions in parallel
     const trackPromise = await Promise
       .all([
-        getAlbumTracks(albumId, token),
-        //getOriginalAlbumTracks(albumId, token)
+        getAlbumTracks(req.albumId, req.token),
+        getAlbumPreference(req.albumId, req.user.id)
       ]);
 
-    const spotifyTracks = trackPromise[0];
-    //const discogsTracks = trackPromise[1]
-    res.status(200).json(spotifyTracks);
+    const [spotifyTracks, preference] = trackPromise;
+    console.log(preference);
+    if (
+      preference
+      && preference.dataValues.track_preferences
+      && preference.dataValues.track_preferences.length === spotifyTracks.length
+    ) {
+      const trackPreferences = spotifyTracks.map((track, index) => {
+        return ({
+          name: track.name,
+          uri: track.uri,
+          play: preference.dataValues.track_preferences[index] === '1' ? true : false
+        });
+      });
+      res.status(200).json(trackPreferences);
+    }
+    else {
+      const trackPreferences = spotifyTracks.map((track) => {
+        return ({
+          name: track.name,
+          uri: track.uri,
+          play: true
+        });
+      });
+      res.status(200).json(trackPreferences);
+    }
   }
   catch(error) {
     next(error);
@@ -80,17 +100,13 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
 
 // Post/update track preferences for the corresponding Spotify album
 trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (req, res, next) => {
-  const albumId = req.albumId;
-  const numTracks = req.body.numTracks;
-  const preferences = req.body.preferences;
-
   try {
     // Create or update album preference
     const [newPreference] = await album_preference.upsert({
-      album_id: albumId,
+      album_id: req.albumId,
       user_id: req.user.id,
-      num_tracks: numTracks,
-      track_preferences: preferences
+      num_tracks: req.body.numTracks,
+      track_preferences: req.body.preferences
     });
     res.status(200).json(newPreference);
   }
