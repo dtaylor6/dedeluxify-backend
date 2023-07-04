@@ -3,8 +3,9 @@ import getOriginalAlbumTracks from '../utils/discogs.js';
 import { Router } from 'express';
 const spotifyRouter = Router();
 
-import { getAlbumTracks, playTracks, queueTracks } from '../utils/spotifyUtils.js';
+import { playTracks, queueTracks } from '../utils/spotifyUtils.js';
 import { combineTrackLists } from '../utils/stringUtils.js';
+import { getSpotifyUser, findDbPreference, findUser } from '../utils/dbMiddleware.js';
 
 // Ensure a proper token is given for each request to this route
 spotifyRouter.use((req, res, next) => {
@@ -49,7 +50,7 @@ spotifyRouter.get('/search', (req, res, next) => {
     });
 });
 
-spotifyRouter.get('/play', async (req, res, next) => {
+spotifyRouter.get('/play', [getSpotifyUser, findUser], async (req, res, next) => {
   const uri = req.query.uri;
   const token = req.token;
 
@@ -61,32 +62,33 @@ spotifyRouter.get('/play', async (req, res, next) => {
   }
 
   try {
-    // Execute both async functions in parallel
-    const trackPromise = await Promise
-      .all([
-        getAlbumTracks(albumId, token),
-        getOriginalAlbumTracks(albumId, token)
-      ]);
+    const { preferencesExist, tracks } = await findDbPreference(albumId, req.user.id, token);
 
-    const spotifyTracks = trackPromise[0];
-    const discogsTracks = trackPromise[1];
+    if (preferencesExist) {
+      const preferredTracks = tracks.filter(track => track.play);
+      const queueResponse = await playTracks(preferredTracks, token);
+      res.status(200).json(queueResponse);
+    }
+    else {
+      const discogsTracks = await getOriginalAlbumTracks(albumId, token);
 
-    // May return an empty array
-    const masterTracks = combineTrackLists(spotifyTracks, discogsTracks);
+      // May return an empty array
+      const masterTracks = combineTrackLists(tracks, discogsTracks);
 
-    // Call Spotify middleware to play original track list
-    const queueResponse = (masterTracks.length > 0) ?
-      await playTracks(masterTracks, uri, token) :
-      await playTracks(spotifyTracks, uri, token);
+      // Call Spotify middleware to play original track list
+      const queueResponse = (masterTracks.length > 0) ?
+        await playTracks(masterTracks, token) :
+        await playTracks(tracks, token);
 
-    res.status(200).json(queueResponse);
+      res.status(200).json(queueResponse);
+    }
   }
   catch(error) {
     next(error);
   }
 });
 
-spotifyRouter.get('/queue', async (req, res, next) => {
+spotifyRouter.get('/queue', [getSpotifyUser, findUser], async (req, res, next) => {
   const uri = req.query.uri;
   const token = req.token;
 
@@ -98,24 +100,26 @@ spotifyRouter.get('/queue', async (req, res, next) => {
   }
 
   try {
-    // Execute both async functions in parallel
-    const trackPromise = await Promise
-      .all([
-        getAlbumTracks(albumId, token),
-        getOriginalAlbumTracks(albumId, token)
-      ]);
+    const { preferencesExist, tracks } = await findDbPreference(albumId, req.user.id, token);
 
-    const spotifyTracks = trackPromise[0];
-    const discogsTracks = trackPromise[1];
-    // May return an empty array
-    const masterTracks = combineTrackLists(spotifyTracks, discogsTracks);
+    if (preferencesExist) {
+      const preferredTracks = tracks.filter(track => track.play);
+      const queueResponse = await queueTracks(preferredTracks, token);
+      res.status(200).json(queueResponse);
+    }
+    else {
+      const discogsTracks = await getOriginalAlbumTracks(albumId, token);
 
-    // Call Spotify middleware to queue original track list
-    const queueResponse = (masterTracks.length > 0) ?
-      await queueTracks(masterTracks, uri, token) :
-      await queueTracks(spotifyTracks, uri, token);
+      // May return an empty array
+      const masterTracks = combineTrackLists(tracks, discogsTracks);
 
-    res.status(200).json(queueResponse);
+      // Call Spotify middleware to play original track list
+      const queueResponse = (masterTracks.length > 0) ?
+        await queueTracks(masterTracks, token) :
+        await queueTracks(tracks, token);
+
+      res.status(200).json(queueResponse);
+    }
   }
   catch(error) {
     next(error);

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { Router } from 'express';
 const trackPreferencesRouter = Router();
 
@@ -33,8 +32,8 @@ const albumIdExtractor = (req, res, next) => {
 // Get Spotify track list and corresponding preferences from db if they exist
 trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
   try {
-    const trackPreferences = await findDbPreference(req.albumId, req.user.id, req.token);
-    res.status(200).json(trackPreferences);
+    const preferred = await findDbPreference(req.albumId, req.user.id, req.token);
+    res.status(200).json(preferred.tracks);
   }
   catch(error) {
     next(error);

@@ -60,7 +60,7 @@ const getAlbumInfo = async (albumId, token) => {
   }
 };
 
-const playTracks = async (tracks, uri, token) => {
+const playTracks = async (tracks, token) => {
   const uris = tracks.map(track => track.uri);
   console.log(tracks);
   const queuedTracks = tracks.map(track => track.name);
@@ -87,7 +87,7 @@ const playTracks = async (tracks, uri, token) => {
   }
 };
 
-const queueTracks = async (tracks, uri, token) => {
+const queueTracks = async (tracks, token) => {
   const uris = tracks.map(track => track.uri);
   console.log(tracks);
   const queuedTracks = tracks.map(track => track.name);

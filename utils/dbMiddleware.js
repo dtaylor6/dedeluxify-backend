@@ -93,19 +93,18 @@ const getAlbumPreference = async (albumId, userId) => {
 const findDbPreference = async (albumId, userId, spotifyToken) => {
   try {
     // Execute both async functions in parallel
-    const trackPromise = await Promise
+    const [spotifyTracks, preference] = await Promise
       .all([
         getAlbumTracks(albumId, spotifyToken),
         getAlbumPreference(albumId, userId)
       ]);
 
-    const [spotifyTracks, preference] = trackPromise;
     if (
       preference
       && Object.hasOwn(preference, 'dataValues')
       && Object.hasOwn(preference.dataValues, 'track_preferences')
     ) {
-      const trackPreferences = spotifyTracks.map((track, index) => {
+      const tracks = spotifyTracks.map((track, index) => {
         return ({
           name: track.name,
           uri: track.uri,
@@ -113,10 +112,10 @@ const findDbPreference = async (albumId, userId, spotifyToken) => {
         });
       });
 
-      return Promise.resolve(trackPreferences);
+      return Promise.resolve({ preferencesExist: true, tracks });
     }
     else {
-      const trackPreferences = spotifyTracks.map((track) => {
+      const tracks = spotifyTracks.map((track) => {
         return ({
           name: track.name,
           uri: track.uri,
@@ -124,7 +123,7 @@ const findDbPreference = async (albumId, userId, spotifyToken) => {
         });
       });
 
-      return Promise.resolve(trackPreferences);
+      return Promise.resolve({ preferencesExist: false, tracks });
     }
   }
   catch(error) {
