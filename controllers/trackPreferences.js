@@ -5,39 +5,15 @@ const trackPreferencesRouter = Router();
 import { getAlbumTracks } from '../utils/spotifyUtils.js';
 
 import { album_preference } from '../models/index.js';
-import { findUser, findOrCreateUser, getAlbumPreference } from '../utils/dbMiddleware.js';
+import {
+  getSpotifyUser,
+  findUser,
+  findOrCreateUser,
+  getAlbumPreference
+} from '../utils/dbMiddleware.js';
 
 // Fetch Spotify id with token for database authentication
-trackPreferencesRouter.use(async (req, res, next) => {
-  const auth = req.headers['authorization'];
-
-  if (auth === '') {
-    return res.status(403).send('No Spotify auth token given in header');
-  }
-  else if (!auth.startsWith('Bearer ')) {
-    return res.status(403).send('Malformatted Spotify auth token given in header. Must be of format: Bearer <token>');
-  }
-  else {
-    req.token = auth;
-  }
-
-  try {
-    const spotifyResponse = await axios
-      .get(
-        'https://api.spotify.com/v1/me', {
-          headers: {
-            'Authorization': req.token,
-          }
-        }
-      );
-
-    req.spotifyUser = spotifyResponse.data;
-  }
-  catch(error) {
-    next(error);
-  }
-  next();
-});
+trackPreferencesRouter.use(getSpotifyUser);
 
 const albumIdExtractor = (req, res, next) => {
   const uri = req.body.uri || req.query.uri;
@@ -67,11 +43,9 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
       ]);
 
     const [spotifyTracks, preference] = trackPromise;
-    console.log(preference);
     if (
-      preference
-      && preference.dataValues.track_preferences
-      && preference.dataValues.track_preferences.length === spotifyTracks.length
+      Object.hasOwn(preference, 'dataValues')
+      && Object.hasOwn(preference.dataValues, 'track_preferences')
     ) {
       const trackPreferences = spotifyTracks.map((track, index) => {
         return ({
@@ -80,6 +54,7 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
           play: preference.dataValues.track_preferences[index] === '1' ? true : false
         });
       });
+
       res.status(200).json(trackPreferences);
     }
     else {

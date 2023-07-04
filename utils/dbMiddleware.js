@@ -1,4 +1,38 @@
+import axios from 'axios';
+
 import { user, album_preference } from '../models/index.js';
+
+const getSpotifyUser = async (req, res, next) => {
+  const auth = req.headers['authorization'];
+
+  if (auth === '') {
+    return res.status(403).send('No Spotify auth token given in header');
+  }
+  else if (!auth.startsWith('Bearer ')) {
+    return res.status(403).send('Malformatted Spotify auth token given in header. Must be of format: Bearer <token>');
+  }
+  else {
+    req.token = auth;
+  }
+
+  try {
+    const spotifyResponse = await axios
+      .get(
+        'https://api.spotify.com/v1/me', {
+          headers: {
+            'Authorization': req.token,
+          }
+        }
+      );
+
+    req.spotifyUser = spotifyResponse.data;
+  }
+  catch(error) {
+    next(error);
+  }
+
+  next();
+};
 
 const findUser = async (req, res, next) => {
   const spotifyId = req.spotifyUser.id;
@@ -56,7 +90,8 @@ const getAlbumPreference = async (albumId, userId) => {
 };
 
 export {
+  getSpotifyUser,
   findUser,
   findOrCreateUser,
-  getAlbumPreference
+  getAlbumPreference,
 };
