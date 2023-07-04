@@ -2,14 +2,12 @@ import axios from 'axios';
 import { Router } from 'express';
 const trackPreferencesRouter = Router();
 
-import { getAlbumTracks } from '../utils/spotifyUtils.js';
-
 import { album_preference } from '../models/index.js';
 import {
   getSpotifyUser,
   findUser,
   findOrCreateUser,
-  getAlbumPreference
+  findDbPreference
 } from '../utils/dbMiddleware.js';
 
 // Fetch Spotify id with token for database authentication
@@ -35,38 +33,8 @@ const albumIdExtractor = (req, res, next) => {
 // Get Spotify track list and corresponding preferences from db if they exist
 trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
   try {
-    // Execute both async functions in parallel
-    const trackPromise = await Promise
-      .all([
-        getAlbumTracks(req.albumId, req.token),
-        getAlbumPreference(req.albumId, req.user.id)
-      ]);
-
-    const [spotifyTracks, preference] = trackPromise;
-    if (
-      Object.hasOwn(preference, 'dataValues')
-      && Object.hasOwn(preference.dataValues, 'track_preferences')
-    ) {
-      const trackPreferences = spotifyTracks.map((track, index) => {
-        return ({
-          name: track.name,
-          uri: track.uri,
-          play: preference.dataValues.track_preferences[index] === '1' ? true : false
-        });
-      });
-
-      res.status(200).json(trackPreferences);
-    }
-    else {
-      const trackPreferences = spotifyTracks.map((track) => {
-        return ({
-          name: track.name,
-          uri: track.uri,
-          play: true
-        });
-      });
-      res.status(200).json(trackPreferences);
-    }
+    const trackPreferences = await findDbPreference(req.albumId, req.user.id, req.token);
+    res.status(200).json(trackPreferences);
   }
   catch(error) {
     next(error);

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { user, album_preference } from '../models/index.js';
+import { getAlbumTracks } from '../utils/spotifyUtils.js';
 
 const getSpotifyUser = async (req, res, next) => {
   const auth = req.headers['authorization'];
@@ -89,9 +90,52 @@ const getAlbumPreference = async (albumId, userId) => {
   }
 };
 
+const findDbPreference = async (albumId, userId, spotifyToken) => {
+  try {
+    // Execute both async functions in parallel
+    const trackPromise = await Promise
+      .all([
+        getAlbumTracks(albumId, spotifyToken),
+        getAlbumPreference(albumId, userId)
+      ]);
+
+    const [spotifyTracks, preference] = trackPromise;
+    if (
+      preference
+      && Object.hasOwn(preference, 'dataValues')
+      && Object.hasOwn(preference.dataValues, 'track_preferences')
+    ) {
+      const trackPreferences = spotifyTracks.map((track, index) => {
+        return ({
+          name: track.name,
+          uri: track.uri,
+          play: preference.dataValues.track_preferences[index] === '1' ? true : false
+        });
+      });
+
+      return Promise.resolve(trackPreferences);
+    }
+    else {
+      const trackPreferences = spotifyTracks.map((track) => {
+        return ({
+          name: track.name,
+          uri: track.uri,
+          play: true
+        });
+      });
+
+      return Promise.resolve(trackPreferences);
+    }
+  }
+  catch(error) {
+    return Promise.reject(error);
+  }
+};
+
 export {
   getSpotifyUser,
   findUser,
   findOrCreateUser,
   getAlbumPreference,
+  findDbPreference
 };
