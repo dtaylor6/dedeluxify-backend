@@ -13,10 +13,7 @@ import {
 trackPreferencesRouter.use(getSpotifyUser);
 
 const albumIdExtractor = (req, res, next) => {
-  console.log('uri: ', req.query.uri);
-  console.log('typeof uri', typeof req.query.uri);
   const uri = req.body.uri || req.query.uri;
-  console.log('uri after or cond', uri);
   if (!uri) {
     return res.status(400).send('No Spotify URI given');
   }
@@ -24,8 +21,8 @@ const albumIdExtractor = (req, res, next) => {
     return res.status(400).send('Spotify URI must be for an album');
   }
 
-  console.log(String(uri).split(':'));
-  req.albumId = String(uri).split(':').at(-1);
+  const uriSplit = String(uri).split(':');
+  req.albumId = (uriSplit.length > 0) ? uriSplit[uriSplit.length - 1] : '';
   if (req.albumId === '') {
     return res.status(400).send('No album id specified');
   }
