@@ -23,7 +23,7 @@ const albumIdExtractor = (req, res, next) => {
     return res.status(400).send('Spotify URI must be for an album');
   }
 
-  req.albumId = uri.toString().split(':').at(-1);
+  req.albumId = String(uri).split(':').at(-1);
   if (req.albumId === '') {
     return res.status(400).send('No album id specified');
   }
