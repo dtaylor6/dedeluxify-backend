@@ -4,6 +4,8 @@ const requestLogger = (request, response, next) => {
   info('Method:', request.method);
   info('Path:  ', request.path);
   info('Body:  ', request.body);
+  info('Params:', request.params);
+  info('Query', request.query);
   info('---');
   next();
 };
