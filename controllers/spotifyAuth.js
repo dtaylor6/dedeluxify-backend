@@ -2,16 +2,19 @@ import pkg from 'request';
 import { Router } from 'express';
 const spotifyAuthRouter = Router();
 
-import { SPOTIFY_CLIENT_ID, SPOTIFY_SECRET, PORT, FRONTEND_PORT } from '../utils/config.js';
+import {
+  SPOTIFY_CLIENT_ID,
+  SPOTIFY_SECRET,
+  FRONTEND_PORT,
+  SPOTIFY_REDIRECT_URI
+} from '../utils/config.js';
 import { stringify } from 'node:querystring';
 import { randomBytes } from 'node:crypto';
 
 const spotify_client_id = SPOTIFY_CLIENT_ID;
 const spotify_client_secret = SPOTIFY_SECRET;
-const port = PORT;
 const frontend_port = FRONTEND_PORT;
 
-const redirect_uri = `http://localhost:${port}/api/spotify/callback`;
 const stateKey = 'spotify_auth_state';
 
 spotifyAuthRouter.get('/login', (req, res) => {
@@ -25,7 +28,7 @@ spotifyAuthRouter.get('/login', (req, res) => {
       response_type: 'code',
       client_id: spotify_client_id,
       scope: scope,
-      redirect_uri: redirect_uri,
+      redirect_uri: SPOTIFY_REDIRECT_URI,
       state: state
     })
   );
@@ -48,7 +51,7 @@ spotifyAuthRouter.get('/callback', (req, res) => {
       url: 'https://accounts.spotify.com/api/token',
       form: {
         code: code,
-        redirect_uri: redirect_uri,
+        redirect_uri: SPOTIFY_REDIRECT_URI,
         grant_type: 'authorization_code'
       },
       headers: {

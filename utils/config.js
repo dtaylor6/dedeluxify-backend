@@ -4,6 +4,7 @@ config();
 const PORT = process.env.PORT;
 const FRONTEND_PORT = process.env.FRONTEND_PORT;
 
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI + 'api/spotify/callback';
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_SECRET = process.env.SPOTIFY_SECRET;
 
@@ -15,6 +16,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 export {
   PORT,
   FRONTEND_PORT,
+  SPOTIFY_REDIRECT_URI,
   SPOTIFY_CLIENT_ID,
   SPOTIFY_SECRET,
   DISCOGS_CLIENT_ID,

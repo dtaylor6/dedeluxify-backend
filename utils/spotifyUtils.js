@@ -46,7 +46,6 @@ const getAlbumInfo = async (albumId, token) => {
     let spotifyResponse = await axios
       .get(
         `https://api.spotify.com/v1/albums/${albumId}`, {
-
           headers: {
             'Authorization': token,
           }
