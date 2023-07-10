@@ -5,15 +5,11 @@ const spotifyAuthRouter = Router();
 import {
   SPOTIFY_CLIENT_ID,
   SPOTIFY_SECRET,
-  FRONTEND_PORT,
+  FRONTEND_URL,
   SPOTIFY_REDIRECT_URI
 } from '../utils/config.js';
 import { stringify } from 'node:querystring';
 import { randomBytes } from 'node:crypto';
-
-const spotify_client_id = SPOTIFY_CLIENT_ID;
-const spotify_client_secret = SPOTIFY_SECRET;
-const frontend_port = FRONTEND_PORT;
 
 const stateKey = 'spotify_auth_state';
 
@@ -26,7 +22,7 @@ spotifyAuthRouter.get('/login', (req, res) => {
   res.redirect('https://accounts.spotify.com/authorize?' +
     stringify({
       response_type: 'code',
-      client_id: spotify_client_id,
+      client_id: SPOTIFY_CLIENT_ID,
       scope: scope,
       redirect_uri: SPOTIFY_REDIRECT_URI,
       state: state
@@ -55,7 +51,7 @@ spotifyAuthRouter.get('/callback', (req, res) => {
         grant_type: 'authorization_code'
       },
       headers: {
-        'Authorization': 'Basic ' + (Buffer.from(spotify_client_id + ':' + spotify_client_secret).toString('base64'))
+        'Authorization': 'Basic ' + (Buffer.from(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_SECRET).toString('base64'))
       },
       json: true
     };
@@ -64,10 +60,10 @@ spotifyAuthRouter.get('/callback', (req, res) => {
   pkg.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       const access_token = body.access_token;
+      const redirectUrl = `${FRONTEND_URL}/login?`;
 
-      return res.redirect(`http://localhost:${frontend_port}/login?` +
-        stringify({
-          access_token: access_token
+      return res.redirect(redirectUrl + stringify(
+        { access_token: access_token
           //refresh_token: refresh_token
         }));
     }
