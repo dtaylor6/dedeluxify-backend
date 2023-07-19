@@ -59,6 +59,24 @@ const getAlbumInfo = async (albumId, token) => {
   }
 };
 
+const getUserInfo = async (token) => {
+  try {
+    const spotifyResponse = await axios
+      .get(
+        'https://api.spotify.com/v1/me', {
+          headers: {
+            'Authorization': token,
+          }
+        }
+      );
+
+    return Promise.resolve(spotifyResponse.data);
+  }
+  catch(error) {
+    return Promise.reject(error);
+  }
+};
+
 const playTracks = async (tracks, token) => {
   const uris = tracks.map(track => track.uri);
   console.log(tracks);
@@ -120,6 +138,7 @@ const queueTracks = async (tracks, token) => {
 export {
   getAlbumTracks,
   getAlbumInfo,
+  getUserInfo,
   playTracks,
   queueTracks
 };

@@ -8,6 +8,7 @@ import {
   FRONTEND_URL,
   SPOTIFY_REDIRECT_URI
 } from '../utils/config.js';
+import { getUserInfo } from '../utils/spotifyUtils.js';
 import { stringify } from 'node:querystring';
 import { randomBytes } from 'node:crypto';
 
@@ -68,11 +69,14 @@ spotifyAuthRouter.get('/callback', async (req, res, next) => {
       );
 
     if (response.status === 200) {
+      const userInfo = await getUserInfo('Bearer ' + response.data.access_token);
       const redirectUrl = `${FRONTEND_URL}/login?`;
+      const pfp = userInfo.images[1].url ? userInfo.images[1].url : userInfo.images[0].url;
 
       return res.redirect(redirectUrl + stringify(
         {
-          access_token: response.data.access_token
+          access_token: response.data.access_token,
+          profile_pic: pfp
         }
       ));
     }
