@@ -131,10 +131,27 @@ const findDbPreference = async (albumId, userId, spotifyToken) => {
   }
 };
 
+const deleteDbPreference = async (albumId, userId) => {
+  try {
+    await album_preference.destroy({
+      where: {
+        album_id: albumId,
+        user_id: userId
+      }
+    });
+
+    return Promise.resolve();
+  }
+  catch(error) {
+    return Promise.reject(error);
+  }
+};
+
 export {
   getSpotifyUser,
   findUser,
   findOrCreateUser,
   getAlbumPreference,
-  findDbPreference
+  findDbPreference,
+  deleteDbPreference
 };

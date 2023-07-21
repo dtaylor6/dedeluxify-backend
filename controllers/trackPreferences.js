@@ -6,7 +6,8 @@ import {
   getSpotifyUser,
   findUser,
   findOrCreateUser,
-  findDbPreference
+  findDbPreference,
+  deleteDbPreference
 } from '../utils/dbMiddleware.js';
 
 // Fetch Spotify id with token for database authentication
@@ -51,6 +52,17 @@ trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (re
       track_preferences: req.body.preferences
     });
     res.status(200).json(newPreference);
+  }
+  catch(error) {
+    next(error);
+  }
+});
+
+// Delete track preferences for the corresponding Spotify album
+trackPreferencesRouter.delete('/', [albumIdExtractor, findUser], async (req, res, next) => {
+  try {
+    await deleteDbPreference(req.albumId, req.user.id);
+    res.status(200).send();
   }
   catch(error) {
     next(error);
