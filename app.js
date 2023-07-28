@@ -1,7 +1,7 @@
-import express, { json } from 'express';
+import express, { json, Router } from 'express';
 import 'express-async-errors';
 const app = express();
-// const inProd = process.env.NODE_ENV === 'production'
+const router = Router();
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
@@ -10,17 +10,19 @@ import spotifyAuthRouter from './controllers/spotifyAuth.js';
 import trackPreferencesRouter from './controllers/trackPreferences.js';
 import { requestLogger, unknownEndpoint, errorHandler } from './utils/middleware.js';
 
-app.use(cors()); // TODO: fix cors policy so it's not a wildcard
-app.use(cookieParser());
-app.use(json());
+router.use(cors()); // TODO: fix cors policy so it's not a wildcard
+router.use(cookieParser());
+router.use(json());
 
-app.use(requestLogger);
+router.use(requestLogger);
 
-app.use('/api/spotify', spotifyAuthRouter);
-app.use('/api/spotify', spotifyRouter);
-app.use('/api/trackPreferences', trackPreferencesRouter);
+router.use('/spotify', spotifyAuthRouter);
+router.use('/spotify', spotifyRouter);
+router.use('/trackPreferences', trackPreferencesRouter);
 
-app.use(unknownEndpoint);
-app.use(errorHandler);
+router.use(unknownEndpoint);
+router.use(errorHandler);
+
+app.use('/api/', router);
 
 export default app;
