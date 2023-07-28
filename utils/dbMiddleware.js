@@ -75,6 +75,11 @@ const findOrCreateUser = async (req, res, next) => {
 };
 
 const getAlbumPreference = async (albumId, userId) => {
+  // User either does not exist or could not be found
+  if (userId < 0) {
+    return undefined;
+  }
+
   try {
     const preference = await album_preference.findOne({
       where: {
@@ -132,6 +137,11 @@ const findDbPreference = async (albumId, userId, spotifyToken) => {
 };
 
 const deleteDbPreference = async (albumId, userId) => {
+  // User either does not exist or could not be found
+  if (userId < 0) {
+    return -1;
+  }
+
   try {
     await album_preference.destroy({
       where: {

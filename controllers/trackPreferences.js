@@ -33,7 +33,8 @@ const albumIdExtractor = (req, res, next) => {
 // Get Spotify track list and corresponding preferences from db if they exist
 trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
   try {
-    const preferred = await findDbPreference(req.albumId, req.user.id, req.token);
+    const userId = req.user ? req.user.id : -1;
+    const preferred = await findDbPreference(req.albumId, userId, req.token);
     res.status(200).json(preferred.tracks);
   }
   catch(error) {
@@ -44,10 +45,12 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
 // Post/update track preferences for the corresponding Spotify album
 trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (req, res, next) => {
   try {
+    const userId = req.user ? req.user.id : -1;
+
     // Create or update album preference
     const [newPreference] = await album_preference.upsert({
       album_id: req.albumId,
-      user_id: req.user.id,
+      user_id: userId,
       num_tracks: req.body.numTracks,
       track_preferences: req.body.preferences
     });
@@ -61,7 +64,8 @@ trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (re
 // Delete track preferences for the corresponding Spotify album
 trackPreferencesRouter.delete('/', [albumIdExtractor, findUser], async (req, res, next) => {
   try {
-    await deleteDbPreference(req.albumId, req.user.id);
+    const userId = req.user ? req.user.id : -1;
+    await deleteDbPreference(req.albumId, userId);
     res.status(200).send();
   }
   catch(error) {
