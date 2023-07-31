@@ -1,6 +1,6 @@
 const supertest = require('supertest');
 const app = require('../app').default;
-const { deleteUser } = require('../services/trackPreferenceService');
+const { deleteUser } = require('../services/trackPreferencesService');
 const api = supertest(app);
 const { sequelize, connectToDatabase } = require('../services/db');
 const { getClientAuthToken } = require('./testUtils');

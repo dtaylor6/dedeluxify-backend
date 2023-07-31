@@ -5,7 +5,7 @@ const spotifyRouter = Router();
 
 import { playTracks, queueTracks } from '../services/spotifyService.js';
 import { combineTrackLists } from '../utils/stringUtils.js';
-import { getSpotifyUser, findDbPreference, findUser } from '../services/trackPreferenceService.js';
+import { getSpotifyUser, findDbPreference, findUser } from '../services/trackPreferencesService.js';
 
 // Ensure a proper token is given for each request to this route
 spotifyRouter.use((req, res, next) => {
