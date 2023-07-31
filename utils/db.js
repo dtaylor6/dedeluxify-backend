@@ -10,6 +10,7 @@ const sequelize = new Sequelize(DATABASE_URL, {
       require: true
     }
   },
+  logging: info
 });
 
 const migrationConf = {
@@ -18,7 +19,7 @@ const migrationConf = {
   },
   storage: new SequelizeStorage({ sequelize, tableName: 'migrations' }),
   context: sequelize.getQueryInterface(),
-  logger: console, // TODO: Give this a better logging solutiuon
+  logger: info
 };
 
 const runMigrations = async () => {
