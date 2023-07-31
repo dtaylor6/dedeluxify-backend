@@ -8,7 +8,7 @@ import {
   FRONTEND_URL,
   SPOTIFY_REDIRECT_URI
 } from '../utils/config.js';
-import { getUserInfo } from '../utils/spotifyUtils.js';
+import { getUserInfo } from '../services/spotifyService.js';
 import { stringify } from 'node:querystring';
 import { randomBytes } from 'node:crypto';
 

@@ -1,8 +1,8 @@
 const supertest = require('supertest');
 const app = require('../app').default;
-const { deleteUser } = require('../utils/dbMiddleware');
+const { deleteUser } = require('../services/trackPreferencesService');
 const api = supertest(app);
-const { sequelize, connectToDatabase } = require('../utils/db');
+const { sequelize, connectToDatabase } = require('../services/db');
 const { getClientAuthToken } = require('./testUtils');
 
 let clientToken = '';

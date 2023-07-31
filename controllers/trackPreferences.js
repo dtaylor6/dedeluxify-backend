@@ -8,7 +8,7 @@ import {
   findOrCreateUser,
   findDbPreference,
   deleteDbPreference
-} from '../utils/dbMiddleware.js';
+} from '../services/trackPreferencesService.js';
 
 // Fetch Spotify id with token for database authentication
 trackPreferencesRouter.use(getSpotifyUser);

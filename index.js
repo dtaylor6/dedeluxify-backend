@@ -4,7 +4,7 @@ import { PORT, NODE_ENV } from './utils/config.js';
 import { info } from './utils/logger.js';
 
 const server = createServer(app);
-import { connectToDatabase } from './utils/db.js';
+import { connectToDatabase } from './services/db.js';
 
 const start = async () => {
   await connectToDatabase();

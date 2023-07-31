@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { user, album_preference } from '../models/index.js';
-import { getAlbumTracks } from '../utils/spotifyUtils.js';
+import { getAlbumTracks } from './spotifyService.js';
 
 const getSpotifyUser = async (req, res, next) => {
   const auth = req.headers['authorization'];
