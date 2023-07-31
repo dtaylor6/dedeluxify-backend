@@ -7,7 +7,8 @@ import {
   findUser,
   findOrCreateUser,
   findDbPreference,
-  deleteDbPreference
+  deleteDbPreference,
+  deleteUser
 } from '../services/trackPreferencesService.js';
 
 // Fetch Spotify id with token for database authentication
@@ -66,6 +67,23 @@ trackPreferencesRouter.delete('/', [albumIdExtractor, findUser], async (req, res
   try {
     const userId = req.user ? req.user.id : -1;
     await deleteDbPreference(req.albumId, userId);
+    res.status(200).send();
+  }
+  catch(error) {
+    next(error);
+  }
+});
+
+// Delete user and all of their album preferences
+trackPreferencesRouter.delete('/user', [findUser], async (req, res, next) => {
+  try {
+    const userId = req.user ? req.user.id : -1;
+    if (userId < 0) {
+      // User doesn't exist or could not be found
+      res.status(200).send();
+    }
+
+    await deleteUser(userId);
     res.status(200).send();
   }
   catch(error) {
