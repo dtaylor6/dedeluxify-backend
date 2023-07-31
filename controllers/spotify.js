@@ -22,7 +22,7 @@ spotifyRouter.use((req, res, next) => {
   next();
 });
 
-spotifyRouter.get('/search', (req, res, next) => {
+spotifyRouter.get('/search', async (req, res, next) => {
   const query = req.query.q;
 
   // Prevent empty query request to Spotify API
@@ -30,24 +30,25 @@ spotifyRouter.get('/search', (req, res, next) => {
     return res.status(400).send('No search query');
   }
 
-  axios
-    .get(
-      'https://api.spotify.com/v1/search', {
-        params: {
-          q: query,
-          type: 'album'
-        },
-        headers: {
-          'Authorization': req.token,
+  try {
+    const queryResponse = await axios
+      .get(
+        'https://api.spotify.com/v1/search', {
+          params: {
+            q: query,
+            type: 'album'
+          },
+          headers: {
+            'Authorization': req.token,
+          }
         }
-      }
-    )
-    .then((response) => {
-      res.status(200).json(response.data.albums.items);
-    })
-    .catch ((error) => {
-      next(error);
-    });
+      );
+
+    res.status(200).json(queryResponse.data.albums.items);
+  }
+  catch(error) {
+    next(error);
+  }
 });
 
 spotifyRouter.get('/play', [getSpotifyUser, findUser], async (req, res, next) => {

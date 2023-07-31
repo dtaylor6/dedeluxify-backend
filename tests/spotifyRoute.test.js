@@ -18,11 +18,18 @@ describe('search tests', () => {
       .expect(401);
   });
 
-  test('search route fails with bad auth header', async () => {
+  test('search route fails with malformatted auth header', async () => {
     await api
       .get('/api/spotify/search')
       .set({ authorization: clientToken.slice(7,) })
       .expect(401);
+  });
+
+  test('search route fails with invalid auth header', async () => {
+    await api
+      .get('/api/spotify/search')
+      .set({ authorization: clientToken + 'z' })
+      .expect(400);
   });
 
   test('search route fails with empty query', async () => {
@@ -39,13 +46,16 @@ describe('search tests', () => {
       .expect(200);
   });
 
-  test('search for album', async () => {
+  test('search for specific album', async () => {
     const response = await api
       .get('/api/spotify/search?q=thriller')
       .set({ authorization: clientToken })
       .expect(200);
 
-    //console.log(response.body);
+    const albumExists = response.body.some(result => {
+      return result.name === 'Thriller' && result.artists[0].name === 'Michael Jackson';
+    });
+    expect(albumExists).toBe(true);
   });
 });
 
