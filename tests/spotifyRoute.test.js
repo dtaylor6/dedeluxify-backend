@@ -1,8 +1,8 @@
 const supertest = require('supertest');
-const app = require('../app');
+const app = require('../app').default;
 const api = supertest(app);
-const sequelize = require('../utils/db').sequelize;
-const getClientAuthToken = require('./testUtils').getClientAuthToken;
+const { sequelize } = require('../utils/db');
+const { getClientAuthToken } = require('./testUtils');
 
 let clientToken = '';
 
@@ -12,8 +12,10 @@ beforeAll(async () => {
 });
 
 describe('search tests', () => {
-  test('use search route', async () => {
-    console.log(clientToken);
+  test('search route fails without auth header', async () => {
+    await api
+      .get('/api/spotify/search')
+      .expect(401);
   });
 });
 

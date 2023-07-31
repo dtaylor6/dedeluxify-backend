@@ -11,7 +11,7 @@ import { getSpotifyUser, findDbPreference, findUser } from '../utils/dbMiddlewar
 spotifyRouter.use((req, res, next) => {
   const auth = req.headers['authorization'];
 
-  if (auth === '') {
+  if (auth === '' || auth === null || auth === undefined) {
     return res.status(401).send('No Spotify auth token given in header');
   }
   else if (!auth.startsWith('Bearer ')) {
@@ -26,7 +26,7 @@ spotifyRouter.get('/search', (req, res, next) => {
   const query = req.query.q;
 
   // Prevent empty query request to Spotify API
-  if (query === '') {
+  if (query === '' || query === null || query === undefined) {
     return res.status(400).send('No search query');
   }
 
@@ -57,7 +57,7 @@ spotifyRouter.get('/play', [getSpotifyUser, findUser], async (req, res, next) =>
   // Get album id from uri
   const albumId = uri.split(':').at(-1);
 
-  if (albumId === '') {
+  if (albumId === '' || albumId === null || albumId === undefined) {
     return res.status(400).send('No album id specified');
   }
 
@@ -95,7 +95,7 @@ spotifyRouter.get('/queue', [getSpotifyUser, findUser], async (req, res, next) =
   // Get album id from uri
   const albumId = uri.split(':').at(-1);
 
-  if (albumId === '') {
+  if (albumId === '' || albumId === null || albumId === undefined) {
     return res.status(400).send('No album id specified');
   }
 

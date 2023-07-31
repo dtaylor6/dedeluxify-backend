@@ -1,5 +1,5 @@
 const supertest = require('supertest');
-const app = require('../app');
+const app = require('../app').default;
 const { deleteUser } = require('../utils/dbMiddleware');
 const api = supertest(app);
 const { sequelize, connectToDatabase } = require('../utils/db');
