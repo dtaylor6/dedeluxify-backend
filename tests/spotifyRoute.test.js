@@ -12,27 +12,27 @@ beforeAll(async () => {
 });
 
 describe('search tests', () => {
-  test('search route fails without auth header', async () => {
+  test('fails without auth header', async () => {
     await api
       .get('/api/spotify/search')
       .expect(401);
   });
 
-  test('search route fails with malformatted auth header', async () => {
+  test('fails with malformatted auth header', async () => {
     await api
       .get('/api/spotify/search')
       .set({ authorization: clientToken.slice(7,) })
       .expect(401);
   });
 
-  test('search route fails with invalid auth header', async () => {
+  test('fails with invalid token', async () => {
     await api
       .get('/api/spotify/search')
       .set({ authorization: clientToken + 'z' })
       .expect(400);
   });
 
-  test('search route fails with empty query', async () => {
+  test('fails with empty query', async () => {
     await api
       .get('/api/spotify/search')
       .set({ authorization: clientToken })
@@ -56,6 +56,52 @@ describe('search tests', () => {
       return result.name === 'Thriller' && result.artists[0].name === 'Michael Jackson';
     });
     expect(albumExists).toBe(true);
+  });
+});
+
+// TODO: Find a way to login with Spotify so playback can be tested
+describe('play tests', () => {
+  test('fails without auth header', async () => {
+    await api
+      .get('/api/spotify/play')
+      .expect(401);
+  });
+
+  test('fails with malformatted auth header', async () => {
+    await api
+      .get('/api/spotify/play')
+      .set({ authorization: clientToken.slice(7,) })
+      .expect(401);
+  });
+
+  test('fails with invalid token', async () => {
+    await api
+      .get('/api/spotify/play')
+      .set({ authorization: clientToken })
+      .expect(401);
+  });
+});
+
+// TODO: Find a way to login with Spotify so playback can be tested
+describe('queue tests', () => {
+  test('fails without auth header', async () => {
+    await api
+      .get('/api/spotify/queue')
+      .expect(401);
+  });
+
+  test('fails with malformatted auth header', async () => {
+    await api
+      .get('/api/spotify/queue')
+      .set({ authorization: clientToken.slice(7,) })
+      .expect(401);
+  });
+
+  test('fails with invalid token', async () => {
+    await api
+      .get('/api/spotify/queue')
+      .set({ authorization: clientToken })
+      .expect(401);
   });
 });
 
