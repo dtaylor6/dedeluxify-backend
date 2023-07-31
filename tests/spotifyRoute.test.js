@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const app = require('../app').default;
 const api = supertest(app);
-const { sequelize } = require('../utils/db');
+const { sequelize } = require('../services/db');
 const { getClientAuthToken } = require('./testUtils');
 
 let clientToken = '';

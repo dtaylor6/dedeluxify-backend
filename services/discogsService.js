@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import { DISCOGS_CLIENT_ID, DISCOGS_SECRET } from './config.js';
-import { trimMusicString } from './stringUtils.js';
-import { getAlbumInfo } from './spotifyUtils.js';
+import { DISCOGS_CLIENT_ID, DISCOGS_SECRET } from '../utils/config.js';
+import { trimMusicString } from '../utils/stringUtils.js';
+import { getAlbumInfo } from './spotifyService.js';
 
 const discogs_client_id = DISCOGS_CLIENT_ID;
 const discogs_secret = DISCOGS_SECRET;
