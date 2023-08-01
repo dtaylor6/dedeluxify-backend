@@ -13,9 +13,18 @@ beforeAll(async () => {
   await connectToDatabase();
 });
 
-describe('delete tests', () => {
-  test('delete user functionality', async () => {
-    await deleteUser(3);
+describe('preference route tests', () => {
+  test('fails with invalid token', async () => {
+    await api
+      .get('/api/trackPreferences')
+      .set({ authorization: clientToken })
+      .expect(401);
+  });
+});
+
+describe('delete service tests', () => {
+  test('delete user that does not exist', async () => {
+    await deleteUser(999999);
   });
 });
 

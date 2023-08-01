@@ -11,7 +11,7 @@ beforeAll(async () => {
   clientToken = 'Bearer ' + clientToken;
 });
 
-describe('search tests', () => {
+describe('search route tests', () => {
   test('fails without auth header', async () => {
     await api
       .get('/api/spotify/search')
@@ -60,7 +60,7 @@ describe('search tests', () => {
 });
 
 // TODO: Find a way to login with Spotify so playback can be tested
-describe('play tests', () => {
+describe('play route tests', () => {
   test('fails without auth header', async () => {
     await api
       .get('/api/spotify/play')
@@ -83,7 +83,7 @@ describe('play tests', () => {
 });
 
 // TODO: Find a way to login with Spotify so playback can be tested
-describe('queue tests', () => {
+describe('queue route tests', () => {
   test('fails without auth header', async () => {
     await api
       .get('/api/spotify/queue')
