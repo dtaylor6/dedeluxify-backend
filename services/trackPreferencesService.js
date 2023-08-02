@@ -164,10 +164,14 @@ const createOrUpdateAlbumPreference = async (albumId, userId, numTracks, prefere
   }
 };
 
+// Returns id of the album deleted, or null if nothing was deleted
 const deleteDbPreference = async (albumId, userId) => {
-  // User either does not exist or could not be found
-  if (userId < 0) {
-    return -1;
+  if (!albumId) {
+    return null;
+  }
+  else if (userId < 0) {
+    // User either does not exist or could not be found
+    return null;
   }
 
   try {
@@ -186,10 +190,11 @@ const deleteDbPreference = async (albumId, userId) => {
   }
 };
 
+// Returns id of the user deleted, or null if nothing was deleted
 const deleteUser = async (userId) => {
   // User either does not exist or could not be found
   if (userId < 0) {
-    return -1;
+    return null;
   }
 
   try {
