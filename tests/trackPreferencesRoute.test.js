@@ -40,7 +40,7 @@ describe('preference route tests', () => {
   });
 });
 
-describe('find user service tests', () => {
+describe('user service tests', () => {
   beforeEach(async () => {
     await clearTestDatabase();
   });
@@ -73,12 +73,6 @@ describe('find user service tests', () => {
     const user2 = await findOrCreateUser('');
     expect(user2).toBe(null);
   });
-});
-
-describe('delete service tests', () => {
-  beforeEach(async () => {
-    await clearTestDatabase();
-  });
 
   test('delete user that does not exist', async () => {
     await deleteUser(999999);
@@ -100,6 +94,16 @@ describe('delete service tests', () => {
     expect(response).toBe(-1);
   });
 });
+
+// describe('album preference service tests', () => {
+//   beforeEach(async () => {
+//     await clearTestDatabase();
+//     await findOrCreateUser('1', 'test_user');
+//     const newUserQuery = await findUser('1');
+//     expect(newUserQuery.display_name).toBe('test_user');
+//   });
+
+// });
 
 afterAll(async () => {
   try{
