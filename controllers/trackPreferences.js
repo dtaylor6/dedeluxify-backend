@@ -1,12 +1,12 @@
 import { Router } from 'express';
 const trackPreferencesRouter = Router();
 
-import { album_preference } from '../models/index.js';
 import {
   getSpotifyUser,
   findUser,
   findOrCreateUser,
   findDbPreference,
+  createOrUpdateAlbumPreference,
   deleteDbPreference,
   deleteUser
 } from '../services/trackPreferencesService.js';
@@ -32,11 +32,12 @@ const albumIdExtractor = (req, res, next) => {
 };
 
 // Get Spotify track list and corresponding preferences from db if they exist
-trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
+trackPreferencesRouter.get('/', [albumIdExtractor], async (req, res, next) => {
   try {
+    req.user = await findUser(req.spotifyUser.id);
     const userId = req.user ? req.user.id : -1;
     const preferred = await findDbPreference(req.albumId, userId, req.token);
-    res.status(200).json(preferred.tracks);
+    return res.status(200).json(preferred.tracks);
   }
   catch(error) {
     next(error);
@@ -44,18 +45,23 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
 });
 
 // Post/update track preferences for the corresponding Spotify album
-trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (req, res, next) => {
+trackPreferencesRouter.post('/', [albumIdExtractor], async (req, res, next) => {
   try {
+    req.user = await findOrCreateUser(req.spotifyUser.id, req.spotifyUser.display_name);
     const userId = req.user ? req.user.id : -1;
+    if (userId < 0) {
+      // Invalid id
+      return res.status(500).send('User could not be found in preference database');
+    }
 
     // Create or update album preference
-    const [newPreference] = await album_preference.upsert({
-      album_id: req.albumId,
-      user_id: userId,
-      num_tracks: req.body.numTracks,
-      track_preferences: req.body.preferences
-    });
-    res.status(200).json(newPreference);
+    const newPreference = await createOrUpdateAlbumPreference(
+      req.albumId,
+      userId,
+      req.body.numTracks,
+      req.body.preferences
+    );
+    return res.status(200).json(newPreference);
   }
   catch(error) {
     next(error);
@@ -63,9 +69,14 @@ trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (re
 });
 
 // Delete track preferences for the corresponding Spotify album
-trackPreferencesRouter.delete('/', [albumIdExtractor, findUser], async (req, res, next) => {
+trackPreferencesRouter.delete('/', [albumIdExtractor], async (req, res, next) => {
   try {
+    req.user = await findUser(req.spotifyUser.id);
     const userId = req.user ? req.user.id : -1;
+    if (userId < 0) {
+      // Invalid id
+      return res.status(200).send('User is already deleted or could not be found');
+    }
     await deleteDbPreference(req.albumId, userId);
     res.status(200).send();
   }
@@ -75,16 +86,17 @@ trackPreferencesRouter.delete('/', [albumIdExtractor, findUser], async (req, res
 });
 
 // Delete user and all of their album preferences
-trackPreferencesRouter.delete('/user', [findUser], async (req, res, next) => {
+trackPreferencesRouter.delete('/user', async (req, res, next) => {
   try {
+    req.user = await findUser(req.spotifyUser.id);
     const userId = req.user ? req.user.id : -1;
     if (userId < 0) {
-      // User doesn't exist or could not be found
-      res.status(200).send();
+      // Invalid id
+      return res.status(200).send('User is already deleted or could not be found');
     }
 
     await deleteUser(userId);
-    res.status(200).send();
+    return res.status(200).send();
   }
   catch(error) {
     next(error);

@@ -51,7 +51,9 @@ spotifyRouter.get('/search', async (req, res, next) => {
   }
 });
 
-spotifyRouter.get('/play', [getSpotifyUser, findUser], async (req, res, next) => {
+spotifyRouter.get('/play', [getSpotifyUser], async (req, res, next) => {
+  req.user = await findUser(req.spotifyUser.id);
+  const userId = req.user ? req.user.id : -1;
   const uri = req.query.uri;
   const token = req.token;
 
@@ -63,7 +65,7 @@ spotifyRouter.get('/play', [getSpotifyUser, findUser], async (req, res, next) =>
   }
 
   try {
-    const { preferencesExist, tracks } = await findDbPreference(albumId, req.user.id, token);
+    const { preferencesExist, tracks } = await findDbPreference(albumId, userId, token);
 
     if (preferencesExist) {
       const preferredTracks = tracks.filter(track => track.play);
@@ -89,7 +91,9 @@ spotifyRouter.get('/play', [getSpotifyUser, findUser], async (req, res, next) =>
   }
 });
 
-spotifyRouter.get('/queue', [getSpotifyUser, findUser], async (req, res, next) => {
+spotifyRouter.get('/queue', [getSpotifyUser], async (req, res, next) => {
+  req.user = await findUser(req.spotifyUser.id);
+  const userId = req.user ? req.user.id : -1;
   const uri = req.query.uri;
   const token = req.token;
 
@@ -101,7 +105,7 @@ spotifyRouter.get('/queue', [getSpotifyUser, findUser], async (req, res, next) =
   }
 
   try {
-    const { preferencesExist, tracks } = await findDbPreference(albumId, req.user.id, token);
+    const { preferencesExist, tracks } = await findDbPreference(albumId, userId, token);
 
     if (preferencesExist) {
       const preferredTracks = tracks.filter(track => track.play);
