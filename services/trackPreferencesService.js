@@ -6,7 +6,7 @@ import { getAlbumTracks } from './spotifyService.js';
 const getSpotifyUser = async (req, res, next) => {
   const auth = req.headers['authorization'];
 
-  if (auth === '') {
+  if (auth === '' || auth === undefined || auth === null) {
     return res.status(403).send('No Spotify auth token given in header');
   }
   else if (!auth.startsWith('Bearer ')) {

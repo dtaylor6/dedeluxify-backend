@@ -2,7 +2,7 @@ const SPOTIFY_CLIENT_ID = require('../utils/config.js').SPOTIFY_CLIENT_ID;
 const SPOTIFY_SECRET = require('../utils/config.js').SPOTIFY_SECRET;
 const axios = require('axios');
 const { sequelize } = require('../services/db');
-const { findOrCreateUser } = require('../services/trackPreferencesService.js');
+const { findUser, findOrCreateUser } = require('../services/trackPreferencesService.js');
 
 // Will not be able to access user specific api routes with this token
 const getClientAuthToken = async () => {
@@ -44,10 +44,10 @@ const clearTestDatabase = async () => {
   return null;
 };
 
-const addUser = async (id, displayName) => {
+const addUser = async (spotifyId, displayName) => {
   const req = {
     spotifyUser: {
-      id: id,
+      id: spotifyId,
       display_name: displayName
     }
   };
@@ -56,8 +56,21 @@ const addUser = async (id, displayName) => {
   return req.user;
 };
 
+const getUser = async (spotifyId, displayName) => {
+  const req = {
+    spotifyUser: {
+      id: spotifyId,
+      display_name: displayName
+    }
+  };
+
+  await findUser(req, undefined, (msg) => msg ? console.log(msg) : 0);
+  return req.user;
+};
+
 module.exports = {
   getClientAuthToken,
   clearTestDatabase,
-  addUser
+  addUser,
+  getUser
 };

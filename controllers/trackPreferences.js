@@ -36,7 +36,7 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
   try {
     const userId = req.user ? req.user.id : -1;
     const preferred = await findDbPreference(req.albumId, userId, req.token);
-    res.status(200).json(preferred.tracks);
+    return res.status(200).json(preferred.tracks);
   }
   catch(error) {
     next(error);
@@ -55,7 +55,7 @@ trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (re
       num_tracks: req.body.numTracks,
       track_preferences: req.body.preferences
     });
-    res.status(200).json(newPreference);
+    return res.status(200).json(newPreference);
   }
   catch(error) {
     next(error);
@@ -79,12 +79,12 @@ trackPreferencesRouter.delete('/user', [findUser], async (req, res, next) => {
   try {
     const userId = req.user ? req.user.id : -1;
     if (userId < 0) {
-      // User doesn't exist or could not be found
-      res.status(200).send();
+      // Invalid id
+      return res.status(400).send('Invalid user id');
     }
 
     await deleteUser(userId);
-    res.status(200).send();
+    return res.status(200).send();
   }
   catch(error) {
     next(error);
