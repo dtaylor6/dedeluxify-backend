@@ -95,15 +95,19 @@ describe('user service tests', () => {
   });
 });
 
-// describe('album preference service tests', () => {
-//   beforeEach(async () => {
-//     await clearTestDatabase();
-//     await findOrCreateUser('1', 'test_user');
-//     const newUserQuery = await findUser('1');
-//     expect(newUserQuery.display_name).toBe('test_user');
-//   });
+describe('album preference service tests', () => {
+  beforeEach(async () => {
+    await clearTestDatabase();
+    await findOrCreateUser('1', 'test_user');
+    const newUserQuery = await findUser('1');
+    expect(newUserQuery.display_name).toBe('test_user');
+  });
 
-// });
+
+  test('create album preference', async () => {
+    console.log('ran');
+  });
+});
 
 afterAll(async () => {
   try{

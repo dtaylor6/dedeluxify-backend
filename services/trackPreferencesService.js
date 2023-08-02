@@ -76,9 +76,12 @@ const findOrCreateUser = async (spotifyId, displayName) => {
 };
 
 const getAlbumPreference = async (albumId, userId) => {
-  // User either does not exist or could not be found
-  if (userId < 0) {
-    return undefined;
+  if (!albumId) {
+    return null;
+  }
+  else if (userId < 0) {
+    // User either does not exist or could not be found
+    return null;
   }
 
   try {
@@ -141,7 +144,7 @@ const findDbPreference = async (albumId, userId, spotifyToken) => {
 
 const createOrUpdateAlbumPreference = async (albumId, userId, numTracks, preferences) => {
   if (!albumId || !userId || !preferences) {
-    return undefined;
+    return null;
   }
 
   try {
@@ -152,6 +155,7 @@ const createOrUpdateAlbumPreference = async (albumId, userId, numTracks, prefere
       num_tracks: numTracks,
       track_preferences: preferences
     });
+
     return Promise.resolve(newPreference);
   }
   catch(error) {
