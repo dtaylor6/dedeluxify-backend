@@ -1,8 +1,7 @@
 const SPOTIFY_CLIENT_ID = require('../utils/config.js').SPOTIFY_CLIENT_ID;
 const SPOTIFY_SECRET = require('../utils/config.js').SPOTIFY_SECRET;
 const axios = require('axios');
-const { sequelize } = require('../services/db');
-const { findUser, findOrCreateUser } = require('../services/trackPreferencesService.js');
+const { sequelize, connectToDatabase } = require('../services/db');
 
 // Will not be able to access user specific api routes with this token
 const getClientAuthToken = async () => {
@@ -33,7 +32,8 @@ const getClientAuthToken = async () => {
 const clearTestDatabase = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ force: true });
+    await sequelize.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
+    await connectToDatabase();
   }
   catch (err) {
     console.log('Failed to clear database');
@@ -44,33 +44,7 @@ const clearTestDatabase = async () => {
   return null;
 };
 
-const addUser = async (spotifyId, displayName) => {
-  const req = {
-    spotifyUser: {
-      id: spotifyId,
-      display_name: displayName
-    }
-  };
-
-  await findOrCreateUser(req, undefined, (msg) => msg ? console.log(msg) : 0);
-  return req.user;
-};
-
-const getUser = async (spotifyId, displayName) => {
-  const req = {
-    spotifyUser: {
-      id: spotifyId,
-      display_name: displayName
-    }
-  };
-
-  await findUser(req, undefined, (msg) => msg ? console.log(msg) : 0);
-  return req.user;
-};
-
 module.exports = {
   getClientAuthToken,
-  clearTestDatabase,
-  addUser,
-  getUser
+  clearTestDatabase
 };

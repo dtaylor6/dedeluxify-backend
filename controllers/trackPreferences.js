@@ -32,8 +32,9 @@ const albumIdExtractor = (req, res, next) => {
 };
 
 // Get Spotify track list and corresponding preferences from db if they exist
-trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, next) => {
+trackPreferencesRouter.get('/', [albumIdExtractor], async (req, res, next) => {
   try {
+    req.user = await findUser(req.spotifyUser.id);
     const userId = req.user ? req.user.id : -1;
     const preferred = await findDbPreference(req.albumId, userId, req.token);
     return res.status(200).json(preferred.tracks);
@@ -44,9 +45,14 @@ trackPreferencesRouter.get('/', [albumIdExtractor, findUser], async (req, res, n
 });
 
 // Post/update track preferences for the corresponding Spotify album
-trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (req, res, next) => {
+trackPreferencesRouter.post('/', [albumIdExtractor], async (req, res, next) => {
   try {
+    req.user = await findOrCreateUser(req.spotifyUser.id, req.spotifyUser.display_name);
     const userId = req.user ? req.user.id : -1;
+    if (userId < 0) {
+      // Invalid id
+      return res.status(500).send('User could not be found in preference database');
+    }
 
     // Create or update album preference
     const [newPreference] = await album_preference.upsert({
@@ -63,9 +69,14 @@ trackPreferencesRouter.post('/', [albumIdExtractor, findOrCreateUser], async (re
 });
 
 // Delete track preferences for the corresponding Spotify album
-trackPreferencesRouter.delete('/', [albumIdExtractor, findUser], async (req, res, next) => {
+trackPreferencesRouter.delete('/', [albumIdExtractor], async (req, res, next) => {
   try {
+    req.user = await findUser(req.spotifyUser.id);
     const userId = req.user ? req.user.id : -1;
+    if (userId < 0) {
+      // Invalid id
+      return res.status(200).send('User is already deleted or could not be found');
+    }
     await deleteDbPreference(req.albumId, userId);
     res.status(200).send();
   }
@@ -75,12 +86,13 @@ trackPreferencesRouter.delete('/', [albumIdExtractor, findUser], async (req, res
 });
 
 // Delete user and all of their album preferences
-trackPreferencesRouter.delete('/user', [findUser], async (req, res, next) => {
+trackPreferencesRouter.delete('/user', async (req, res, next) => {
   try {
+    req.user = await findUser(req.spotifyUser.id);
     const userId = req.user ? req.user.id : -1;
     if (userId < 0) {
       // Invalid id
-      return res.status(400).send('Invalid user id');
+      return res.status(200).send('User is already deleted or could not be found');
     }
 
     await deleteUser(userId);

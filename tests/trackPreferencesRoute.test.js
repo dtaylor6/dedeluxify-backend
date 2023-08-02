@@ -4,10 +4,9 @@ const { deleteUser } = require('../services/trackPreferencesService');
 const api = supertest(app);
 const {
   getClientAuthToken,
-  clearTestDatabase,
-  addUser,
-  getUser
+  clearTestDatabase
 } = require('./testUtils');
+const { findUser, findOrCreateUser } = require('../services/trackPreferencesService.js');
 const { sequelize } = require('../services/db');
 
 let clientToken = '';
@@ -18,6 +17,7 @@ beforeAll(async () => {
   await clearTestDatabase();
 });
 
+// TODO: Find a way to login with Spotify so Spotify auth can be tested
 describe('preference route tests', () => {
   test('fails with invalid token', async () => {
     await api
@@ -40,9 +40,24 @@ describe('preference route tests', () => {
   });
 });
 
-// describe('find user service tests', () => {
+describe('find user service tests', () => {
+  beforeEach(async () => {
+    await clearTestDatabase();
+  });
 
-// });
+  test('find user that does exist', async () => {
+    await findOrCreateUser('1', 'test_user');
+    const newUserQuery = await findUser('1');
+    expect(newUserQuery.display_name).toBe('test_user');
+    expect(newUserQuery.spotify_id).toBe('1');
+  });
+
+  test('fail to find user that does not exist', async () => {
+    await findOrCreateUser('1', 'test_user');
+    const newUserQuery = await findUser('5');
+    expect(newUserQuery).toBe(null);
+  });
+});
 
 describe('delete service tests', () => {
   beforeEach(async () => {
@@ -54,13 +69,13 @@ describe('delete service tests', () => {
   });
 
   test('delete user that does exist', async () => {
-    const newUser = await addUser('1', 'test_user');
-    const newUserQuery = await getUser('1', 'test_user');
+    const newUser = await findOrCreateUser('1', 'test_user');
+    const newUserQuery = await findUser('1');
     expect(newUserQuery.display_name).toBe('test_user');
     expect(newUserQuery.spotify_id).toBe('1');
 
     await deleteUser(newUser.id);
-    const user = await getUser('1', 'test_user');
+    const user = await findUser('1');
     expect(user).toBe(null);
   });
 

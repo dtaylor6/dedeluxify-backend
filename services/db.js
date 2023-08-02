@@ -3,6 +3,7 @@ import { Umzug, SequelizeStorage } from 'umzug';
 
 import { DATABASE_URL } from '../utils/config.js';
 import { info, error } from '../utils/logger.js';
+import { NODE_ENV } from '../utils/config.js';
 
 const sequelize = new Sequelize(DATABASE_URL, {
   dialectOptions: {
@@ -10,7 +11,7 @@ const sequelize = new Sequelize(DATABASE_URL, {
       require: true
     }
   },
-  logging: info
+  logging: false
 });
 
 const migrationConf = {
@@ -19,7 +20,7 @@ const migrationConf = {
   },
   storage: new SequelizeStorage({ sequelize, tableName: 'migrations' }),
   context: sequelize.getQueryInterface(),
-  logger: info
+  logger: NODE_ENV === 'test' ? undefined : console
 };
 
 const runMigrations = async () => {

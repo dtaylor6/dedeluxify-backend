@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import { user, album_preference } from '../models/index.js';
 import { getAlbumTracks } from './spotifyService.js';
+import { error as errorLogger } from '../utils/logger.js';
 
 const getSpotifyUser = async (req, res, next) => {
   const auth = req.headers['authorization'];
@@ -35,43 +36,42 @@ const getSpotifyUser = async (req, res, next) => {
   next();
 };
 
-const findUser = async (req, res, next) => {
-  const spotifyId = req.spotifyUser.id;
+const findUser = async (spotifyId) => {
   if (!spotifyId) {
-    return res.status(401).send('The server encountered an error authenticating through Spotify');
+    return null;
   }
 
   try {
-    req.user = await user.findOne({ where: { spotify_id: spotifyId } });
+    const userEntry = await user.findOne({ where: { spotify_id: spotifyId } });
+    return Promise.resolve(userEntry);
   }
   catch(error) {
-    next(error);
+    errorLogger(error);
+    return Promise.reject(null);
   }
-
-  next();
 };
 
-const findOrCreateUser = async (req, res, next) => {
-  const spotifyId = req.spotifyUser.id;
-  const displayName = req.spotifyUser.display_name;
+const findOrCreateUser = async (spotifyId, displayName) => {
   if (!spotifyId) {
-    return res.status(401).send('The server encountered an error authenticating through Spotify');
+    errorLogger('Invalid Spotify id');
+    return null;
   }
 
   try {
-    [req.user] = await user.findOrCreate({
+    const [userEntry] = await user.findOrCreate({
       where: { spotify_id: spotifyId },
       defaults: {
         spotify_id: spotifyId,
         display_name: displayName
       }
     });
+
+    return Promise.resolve(userEntry);
   }
   catch(error) {
-    next(error);
+    errorLogger(error);
+    return Promise.reject(null);
   }
-
-  next();
 };
 
 const getAlbumPreference = async (albumId, userId) => {
@@ -91,6 +91,7 @@ const getAlbumPreference = async (albumId, userId) => {
     return Promise.resolve(preference);
   }
   catch(error) {
+    errorLogger(error);
     return Promise.reject(error);
   }
 };
@@ -132,6 +133,7 @@ const findDbPreference = async (albumId, userId, spotifyToken) => {
     }
   }
   catch(error) {
+    errorLogger(error);
     return Promise.reject(error);
   }
 };
@@ -153,6 +155,7 @@ const deleteDbPreference = async (albumId, userId) => {
     return Promise.resolve(albumId);
   }
   catch(error) {
+    errorLogger(error);
     return Promise.reject(error);
   }
 };
@@ -169,6 +172,7 @@ const deleteUser = async (userId) => {
     return Promise.resolve(userId);
   }
   catch(error) {
+    errorLogger(error);
     return Promise.reject(error);
   }
 };
