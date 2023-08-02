@@ -2,15 +2,15 @@ const supertest = require('supertest');
 const app = require('../app').default;
 const { deleteUser } = require('../services/trackPreferencesService');
 const api = supertest(app);
-const { sequelize, connectToDatabase } = require('../services/db');
-const { getClientAuthToken } = require('./testUtils');
+const { getClientAuthToken, clearTestDatabase } = require('./testUtils');
+const { sequelize } = require('../services/db');
 
 let clientToken = '';
 
 beforeAll(async () => {
   clientToken = await getClientAuthToken();
   clientToken = 'Bearer ' + clientToken;
-  await connectToDatabase();
+  await clearTestDatabase();
 });
 
 describe('preference route tests', () => {
@@ -35,5 +35,4 @@ afterAll(async () => {
   catch(error) {
     console.log(error);
   }
-
 });

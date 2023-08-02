@@ -1,6 +1,7 @@
 const SPOTIFY_CLIENT_ID = require('../utils/config.js').SPOTIFY_CLIENT_ID;
 const SPOTIFY_SECRET = require('../utils/config.js').SPOTIFY_SECRET;
 const axios = require('axios');
+const { sequelize } = require('../services/db');
 
 // Will not be able to access user specific api routes with this token
 const getClientAuthToken = async () => {
@@ -28,6 +29,21 @@ const getClientAuthToken = async () => {
   }
 };
 
+const clearTestDatabase = async () => {
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync({ force: true });
+  }
+  catch (err) {
+    console.log('Failed to clear database');
+    console.log(err);
+    return process.exit(1);
+  }
+
+  return null;
+};
+
 module.exports = {
-  getClientAuthToken
+  getClientAuthToken,
+  clearTestDatabase
 };
