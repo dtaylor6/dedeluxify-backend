@@ -15,8 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     strategy:
-      node-version: [16.x]
-      # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v3
