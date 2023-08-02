@@ -38,6 +38,7 @@ const getSpotifyUser = async (req, res, next) => {
 
 const findUser = async (spotifyId) => {
   if (!spotifyId) {
+    errorLogger('Invalid Spotify id');
     return null;
   }
 
@@ -138,10 +139,31 @@ const findDbPreference = async (albumId, userId, spotifyToken) => {
   }
 };
 
+const createOrUpdateAlbumPreference = async (albumId, userId, numTracks, preferences) => {
+  if (!albumId || !userId || !preferences) {
+    return undefined;
+  }
+
+  try {
+    // Create or update album preference
+    const [newPreference] = await album_preference.upsert({
+      album_id: albumId,
+      user_id: userId,
+      num_tracks: numTracks,
+      track_preferences: preferences
+    });
+    return Promise.resolve(newPreference);
+  }
+  catch(error) {
+    errorLogger(error);
+    return Promise.reject(error);
+  }
+};
+
 const deleteDbPreference = async (albumId, userId) => {
   // User either does not exist or could not be found
   if (userId < 0) {
-    return Promise.resolve(-1);
+    return -1;
   }
 
   try {
@@ -183,6 +205,7 @@ export {
   findOrCreateUser,
   getAlbumPreference,
   findDbPreference,
+  createOrUpdateAlbumPreference,
   deleteDbPreference,
   deleteUser
 };

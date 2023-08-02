@@ -57,6 +57,22 @@ describe('find user service tests', () => {
     const newUserQuery = await findUser('5');
     expect(newUserQuery).toBe(null);
   });
+
+  test('fail to find user with no id specified', async () => {
+    const user = await findUser();
+    expect(user).toBe(null);
+
+    const user2 = await findUser('');
+    expect(user2).toBe(null);
+  });
+
+  test('fail to find/create user with no id specified', async () => {
+    const user = await findOrCreateUser();
+    expect(user).toBe(null);
+
+    const user2 = await findOrCreateUser('');
+    expect(user2).toBe(null);
+  });
 });
 
 describe('delete service tests', () => {

@@ -35,7 +35,7 @@ const clearTestDatabase = async () => {
     await sequelize.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
     await connectToDatabase();
   }
-  catch (err) {
+  catch(err) {
     console.log('Failed to clear database');
     console.log(err);
     return process.exit(1);

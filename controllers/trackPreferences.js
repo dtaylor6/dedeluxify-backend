@@ -1,12 +1,12 @@
 import { Router } from 'express';
 const trackPreferencesRouter = Router();
 
-import { album_preference } from '../models/index.js';
 import {
   getSpotifyUser,
   findUser,
   findOrCreateUser,
   findDbPreference,
+  createOrUpdateAlbumPreference,
   deleteDbPreference,
   deleteUser
 } from '../services/trackPreferencesService.js';
@@ -55,12 +55,12 @@ trackPreferencesRouter.post('/', [albumIdExtractor], async (req, res, next) => {
     }
 
     // Create or update album preference
-    const [newPreference] = await album_preference.upsert({
-      album_id: req.albumId,
-      user_id: userId,
-      num_tracks: req.body.numTracks,
-      track_preferences: req.body.preferences
-    });
+    const newPreference = await createOrUpdateAlbumPreference(
+      req.albumId,
+      userId,
+      req.body.numTracks,
+      req.body.preferences
+    );
     return res.status(200).json(newPreference);
   }
   catch(error) {
