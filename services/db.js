@@ -46,6 +46,7 @@ const connectToDatabase = async () => {
   catch (err) {
     error('Failed to connect to database');
     error(err);
+    console.log(err); // temp for pipeline
     return process.exit(1);
   }
 
