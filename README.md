@@ -1,6 +1,6 @@
 <div align="center">
 
-  ![logo](https://github.com/dtaylor6/dedeluxify-backend/assets/57015811/8f379653-94a6-4b35-9437-33f5b688f367)
+![logo](https://github.com/dtaylor6/dedeluxify/assets/57015811/22a23ecc-71b2-4545-8af1-a4ad6b9ea744)
 
 </div>
 
