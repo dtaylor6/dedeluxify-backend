@@ -15,7 +15,7 @@ Postgres: Data storage for saved user preferences
 
 Express: Backend RESTful API
 
-Discogs API: Master release metadata for original album track listings
+Discogs API: Album master release metadata
 
 Spotify Web API: Music playback, track metadata, and OAuth authentication
 
