@@ -5,7 +5,7 @@
 </div>
 
 ## About
-This repository contains the source code for the backend of [dedeluxify](https://github.com/dtaylor6/dedeluxify).
+This repository contains the source code for the Express backend app of [dedeluxify](https://github.com/dtaylor6/dedeluxify).
 
 ### Technologies
 
