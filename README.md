@@ -13,6 +13,8 @@ Full-stack JavaScript: Powered by Node.js
 
 Postgres: Data storage for saved user preferences
 
+Express: Backend RESTful API
+
 Discogs API: Master release metadata for original album track listings
 
 Spotify Web API: Music playback, track metadata, and OAuth authentication
