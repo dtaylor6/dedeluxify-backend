@@ -13,7 +13,7 @@ Full-stack JavaScript: Powered by Node.js
 
 Postgres: Data storage for saved user preferences
 
-Express: Backend RESTful API
+Express: Backend app and RESTful API
 
 Discogs API: Album master release metadata
 
