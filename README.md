@@ -5,7 +5,7 @@
 </div>
 
 ## About
-This repository contains the source code for the Express backend app of [dedeluxify](https://github.com/dtaylor6/dedeluxify).
+This repository contains the source code for the backend Express app of [dedeluxify](https://github.com/dtaylor6/dedeluxify).
 
 ### Technologies
 
@@ -13,7 +13,7 @@ Full-stack JavaScript: Powered by Node.js
 
 Postgres: Data storage for saved user preferences
 
-Express: Backend app and RESTful API
+Express: Backend Express app with RESTful API
 
 Discogs API: Album master release metadata
 
