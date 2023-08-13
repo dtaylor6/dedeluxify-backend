@@ -1,3 +1,5 @@
+import Fuse from 'fuse.js';
+
 // Returns a new string consisting of only unicode letters and unicode digits
 const getLettersDigits = (str) => {
   const regex = /[^\p{L}\p{N}]+/gu;
@@ -49,23 +51,35 @@ const trimMusicStringLower = (str) => {
 };
 
 const combineTrackLists = (spotifyTracks, discogsTracks) => {
+  const fuseOptions = {
+    // isCaseSensitive: false,
+    // includeScore: false,
+    // shouldSort: true,
+    // includeMatches: false,
+    // findAllMatches: false,
+    // minMatchCharLength: 1,
+    // location: 0,
+    threshold: 0.2,
+    // distance: 100,
+    // useExtendedSearch: false,
+    // ignoreLocation: false,
+    // ignoreFieldNorm: false,
+    // fieldNormWeight: 1,
+
+    keys: [
+      'name'
+    ]
+  };
+
+  // Use fuzzy string search to combine track lists
+  const fuse = new Fuse(spotifyTracks, fuseOptions);
+
   const tracks = [];
-  const masterTracks = discogsTracks
-    .map(track => getLettersDigits(trimMusicStringLower(track)));
-
-  for (let i = 0; i < spotifyTracks.length; ++i) {
-    if (masterTracks.length < 1) {
-      break;
-    }
-
-    const trimmedSpotify = getLettersDigits(trimMusicStringLower(spotifyTracks[i].name));
-    for (let j = 0; j < masterTracks.length; ++j) {
-      if (trimmedSpotify.includes(masterTracks[j])) {
-        tracks.push(spotifyTracks[i]);
-        masterTracks.splice(j, 1);
-        j -= 1;
-        break;
-      }
+  for (let i = 0; i < discogsTracks.length; ++i) {
+    const results = fuse.search(discogsTracks[i]);
+    if (results.length > 0) {
+      const bestMatch = results[0];
+      tracks.push(bestMatch.item);
     }
   }
 
