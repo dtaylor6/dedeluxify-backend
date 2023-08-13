@@ -50,30 +50,6 @@ const trimMusicStringLower = (str) => {
   return newStr;
 };
 
-// const combineTrackLists = (spotifyTracks, discogsTracks) => {
-//   const tracks = [];
-//   const masterTracks = discogsTracks
-//     .map(track => getLettersDigits(trimMusicStringLower(track)));
-
-//   for (let i = 0; i < spotifyTracks.length; ++i) {
-//     if (masterTracks.length < 1) {
-//       break;
-//     }
-
-//     const trimmedSpotify = getLettersDigits(trimMusicStringLower(spotifyTracks[i].name));
-//     for (let j = 0; j < masterTracks.length; ++j) {
-//       if (trimmedSpotify.includes(masterTracks[j])) {
-//         tracks.push(spotifyTracks[i]);
-//         masterTracks.splice(j, 1);
-//         j -= 1;
-//         break;
-//       }
-//     }
-//   }
-
-//   return tracks;
-// };
-
 const combineTrackLists = (spotifyTracks, discogsTracks) => {
   const fuseOptions = {
     // isCaseSensitive: false,
@@ -107,7 +83,6 @@ const combineTrackLists = (spotifyTracks, discogsTracks) => {
     }
   }
 
-  console.log(tracks);
   return tracks;
 };
 
